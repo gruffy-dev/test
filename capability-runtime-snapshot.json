@@ -1,0 +1,2686 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "local-container-platform-observability-read-v6",
+  "providers": [
+    {
+      "provider_name": "kubernetes-mcp",
+      "transport": "streamable_http",
+      "header_strategy": "ada_request_context",
+      "base_url": "http://localhost:8080/mcp",
+      "allowed_tool_names": [
+        "resources_list",
+        "resources_get",
+        "pods_log"
+      ]
+    },
+    {
+      "provider_name": "obs-mcp",
+      "transport": "streamable_http",
+      "header_strategy": "ada_request_context",
+      "base_url": "http://127.0.0.1:9100/mcp",
+      "allowed_tool_names": [
+        "execute_range_query"
+      ]
+    }
+  ],
+  "capabilities": [
+    {
+      "name": "kubernetes.pods.running.count",
+      "description": "Count running Kubernetes pods in one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Pod"
+            },
+            {
+              "tool_argument_name": "fieldSelector",
+              "source": "fixed",
+              "fixed_value": "status.phase=Running"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/items",
+            "operation": "count",
+            "output_field": "running_pod_count",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 500000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.pods.status.read",
+      "description": "Read bounded Kubernetes pod status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Pod"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "pod_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.events.read",
+      "description": "Read bounded Kubernetes event evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Event"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "event_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.pod.logs.read",
+      "description": "Read a bounded tail of logs from one explicitly supplied Kubernetes pod.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "pods_log",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "pod_name"
+              ],
+              "semantic_argument_patterns": {
+                "pod_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "container",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "container_name"
+              ],
+              "semantic_argument_patterns": {
+                "container_name": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": false
+            },
+            {
+              "tool_argument_name": "previous",
+              "source": "fixed",
+              "fixed_value": false
+            },
+            {
+              "tool_argument_name": "tail",
+              "source": "fixed",
+              "fixed_value": 100
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "log_evidence",
+            "evidence_tool_argument_names": [
+              "name",
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 1000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.pod.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes pod.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Pod"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "pod_name"
+              ],
+              "semantic_argument_patterns": {
+                "pod_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "pod_detail",
+            "evidence_tool_argument_names": [
+              "name",
+              "namespace"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.http.responses.read",
+      "description": "Read bounded HTTP response-rate evidence grouped by response class for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "sum by (code) (rate(haproxy_backend_http_responses_total{managed_cluster_name=\"<name>\"}[5m]))"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "http_response_evidence",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.http.latency.read",
+      "description": "Read bounded HTTP response-latency evidence in milliseconds, with sample timestamps represented as Unix epoch seconds, for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "max(haproxy_backend_http_average_response_latency_milliseconds{managed_cluster_name=\"<name>\"})"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "http_response_latency_milliseconds",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.http.connection.errors.read",
+      "description": "Read bounded HTTP backend connection-error-rate evidence for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "sum(rate(haproxy_backend_connection_errors_total{managed_cluster_name=\"<name>\"}[5m]))"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "http_connection_error_evidence",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.deployments.status.read",
+      "description": "Read bounded Kubernetes Deployment status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "apps/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Deployment"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "deployment_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.replicasets.status.read",
+      "description": "Read bounded Kubernetes ReplicaSet status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "apps/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "ReplicaSet"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "replicaset_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.statefulsets.status.read",
+      "description": "Read bounded Kubernetes StatefulSet status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "apps/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "StatefulSet"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "statefulset_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.daemonsets.status.read",
+      "description": "Read bounded Kubernetes DaemonSet status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "apps/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "DaemonSet"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "daemonset_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.jobs.status.read",
+      "description": "Read bounded Kubernetes Job status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "batch/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Job"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "job_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.deployment.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes Deployment.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "apps/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Deployment"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "deployment_name"
+              ],
+              "semantic_argument_patterns": {
+                "deployment_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "deployment_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.replicaset.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes ReplicaSet.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "apps/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "ReplicaSet"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "replicaset_name"
+              ],
+              "semantic_argument_patterns": {
+                "replicaset_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "replicaset_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.statefulset.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes StatefulSet.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "apps/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "StatefulSet"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "statefulset_name"
+              ],
+              "semantic_argument_patterns": {
+                "statefulset_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "statefulset_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.daemonset.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes DaemonSet.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "apps/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "DaemonSet"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "daemonset_name"
+              ],
+              "semantic_argument_patterns": {
+                "daemonset_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "daemonset_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.job.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes Job.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "batch/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Job"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "job_name"
+              ],
+              "semantic_argument_patterns": {
+                "job_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "job_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.services.read",
+      "description": "Read bounded Kubernetes Service evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Service"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "service_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.endpoints.read",
+      "description": "Read bounded Kubernetes Endpoints evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Endpoints"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "endpoint_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.ingresses.status.read",
+      "description": "Read bounded Kubernetes Ingress status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "networking.k8s.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Ingress"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "ingress_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "openshift.routes.status.read",
+      "description": "Read bounded OpenShift Route status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "route.openshift.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Route"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "route_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.networkpolicies.read",
+      "description": "Read bounded Kubernetes NetworkPolicy evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "networking.k8s.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "NetworkPolicy"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "network_policy_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.service.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes Service.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Service"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "service_name"
+              ],
+              "semantic_argument_patterns": {
+                "service_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "service_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.endpoint.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes Endpoints object.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Endpoints"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "endpoint_name"
+              ],
+              "semantic_argument_patterns": {
+                "endpoint_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "endpoint_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.ingress.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes Ingress.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "networking.k8s.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Ingress"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "ingress_name"
+              ],
+              "semantic_argument_patterns": {
+                "ingress_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "ingress_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "openshift.route.detail.read",
+      "description": "Read complete structured details for one explicitly identified OpenShift Route.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "route.openshift.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Route"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "route_name"
+              ],
+              "semantic_argument_patterns": {
+                "route_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "route_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.networkpolicy.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes NetworkPolicy.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "networking.k8s.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "NetworkPolicy"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "network_policy_name"
+              ],
+              "semantic_argument_patterns": {
+                "network_policy_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "network_policy_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.persistentvolumeclaims.status.read",
+      "description": "Read bounded Kubernetes PersistentVolumeClaim status evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "PersistentVolumeClaim"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "persistent_volume_claim_status_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.persistentvolumes.status.read",
+      "description": "Read bounded cluster-scoped Kubernetes PersistentVolume status evidence.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "PersistentVolume"
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "persistent_volume_status_evidence",
+            "evidence_tool_argument_names": [],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.storageclasses.read",
+      "description": "Read bounded cluster-scoped Kubernetes StorageClass evidence.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "storage.k8s.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "StorageClass"
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "storage_class_evidence",
+            "evidence_tool_argument_names": [],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.volumeattachments.status.read",
+      "description": "Read bounded cluster-scoped Kubernetes VolumeAttachment status evidence.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "storage.k8s.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "VolumeAttachment"
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "volume_attachment_status_evidence",
+            "evidence_tool_argument_names": [],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.persistentvolumeclaim.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes PersistentVolumeClaim.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "PersistentVolumeClaim"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "persistent_volume_claim_name"
+              ],
+              "semantic_argument_patterns": {
+                "persistent_volume_claim_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "persistent_volume_claim_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.persistentvolume.detail.read",
+      "description": "Read complete structured details for one explicitly identified cluster-scoped Kubernetes PersistentVolume.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "PersistentVolume"
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "persistent_volume_name"
+              ],
+              "semantic_argument_patterns": {
+                "persistent_volume_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "persistent_volume_detail",
+            "evidence_tool_argument_names": [
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.volumeattachment.detail.read",
+      "description": "Read complete structured details for one explicitly identified cluster-scoped Kubernetes VolumeAttachment.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "storage.k8s.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "VolumeAttachment"
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "volume_attachment_name"
+              ],
+              "semantic_argument_patterns": {
+                "volume_attachment_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "volume_attachment_detail",
+            "evidence_tool_argument_names": [
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.nodes.status.read",
+      "description": "Read bounded cluster-scoped Kubernetes Node status evidence.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Node"
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "node_status_evidence",
+            "evidence_tool_argument_names": [],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.resourcequotas.read",
+      "description": "Read bounded Kubernetes ResourceQuota evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "ResourceQuota"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "resource_quota_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.limitranges.read",
+      "description": "Read bounded Kubernetes LimitRange evidence from one explicitly supplied namespace.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "LimitRange"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "limit_range_evidence",
+            "evidence_tool_argument_names": [
+              "namespace"
+            ],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.node.detail.read",
+      "description": "Read complete structured details for one explicitly identified cluster-scoped Kubernetes Node.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "Node"
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "node_name"
+              ],
+              "semantic_argument_patterns": {
+                "node_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "node_detail",
+            "evidence_tool_argument_names": [
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.resourcequota.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes ResourceQuota.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "ResourceQuota"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "resource_quota_name"
+              ],
+              "semantic_argument_patterns": {
+                "resource_quota_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "resource_quota_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "kubernetes.limitrange.detail.read",
+      "description": "Read complete structured details for one explicitly identified Kubernetes LimitRange.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "LimitRange"
+            },
+            {
+              "tool_argument_name": "namespace",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "namespace"
+              ],
+              "semantic_argument_patterns": {
+                "namespace": "[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?"
+              },
+              "required": true
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "limit_range_name"
+              ],
+              "semantic_argument_patterns": {
+                "limit_range_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "limit_range_detail",
+            "evidence_tool_argument_names": [
+              "namespace",
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "openshift.clusteroperators.status.read",
+      "description": "Read bounded cluster-scoped OpenShift ClusterOperator status evidence.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "config.openshift.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "ClusterOperator"
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "cluster_operator_status_evidence",
+            "evidence_tool_argument_names": [],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "openshift.clusterversion.status.read",
+      "description": "Read bounded cluster-scoped OpenShift ClusterVersion status evidence.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "config.openshift.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "ClusterVersion"
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "cluster_version_status_evidence",
+            "evidence_tool_argument_names": [],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "openshift.machineconfigpools.status.read",
+      "description": "Read bounded cluster-scoped OpenShift MachineConfigPool status evidence.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_list",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "machineconfiguration.openshift.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "MachineConfigPool"
+            }
+          ],
+          "result_binding": {
+            "content_source": "text_content",
+            "content_media_type": "text/plain",
+            "content_block_index": 0,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "machine_config_pool_status_evidence",
+            "evidence_tool_argument_names": [],
+            "maximum_response_characters": 30000,
+            "maximum_collection_items": 2000
+          }
+        }
+      ]
+    },
+    {
+      "name": "openshift.clusteroperator.detail.read",
+      "description": "Read complete structured details for one explicitly identified cluster-scoped OpenShift ClusterOperator.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "config.openshift.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "ClusterOperator"
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "cluster_operator_name"
+              ],
+              "semantic_argument_patterns": {
+                "cluster_operator_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "cluster_operator_detail",
+            "evidence_tool_argument_names": [
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "openshift.clusterversion.detail.read",
+      "description": "Read complete structured details for one explicitly identified cluster-scoped OpenShift ClusterVersion.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "config.openshift.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "ClusterVersion"
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "cluster_version_name"
+              ],
+              "semantic_argument_patterns": {
+                "cluster_version_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "cluster_version_detail",
+            "evidence_tool_argument_names": [
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "openshift.machineconfigpool.detail.read",
+      "description": "Read complete structured details for one explicitly identified cluster-scoped OpenShift MachineConfigPool.",
+      "provider_bindings": [
+        {
+          "provider_name": "kubernetes-mcp",
+          "tool_name": "resources_get",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "apiVersion",
+              "source": "fixed",
+              "fixed_value": "machineconfiguration.openshift.io/v1"
+            },
+            {
+              "tool_argument_name": "kind",
+              "source": "fixed",
+              "fixed_value": "MachineConfigPool"
+            },
+            {
+              "tool_argument_name": "name",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "machine_config_pool_name"
+              ],
+              "semantic_argument_patterns": {
+                "machine_config_pool_name": "[a-z0-9](?:[-a-z0-9.]{0,251}[a-z0-9])?"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "",
+            "operation": "select",
+            "output_field": "machine_config_pool_detail",
+            "evidence_tool_argument_names": [
+              "name"
+            ],
+            "maximum_response_characters": 100000,
+            "maximum_collection_items": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.http.sessions.read",
+      "description": "Read bounded current HTTP backend session evidence, represented as a session count with Unix epoch-second sample timestamps, for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "sum(haproxy_backend_current_sessions{managed_cluster_name=\"<name>\"})"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "http_current_session_count",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.compute.cpu.read",
+      "description": "Read bounded container CPU usage-rate evidence, represented as consumed CPU cores with Unix epoch-second sample timestamps, for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "sum(rate(container_cpu_usage_seconds_total{managed_cluster_name=\"<name>\",container!=\"\",container!=\"POD\"}[5m]))"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "compute_cpu_usage_cores",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.compute.memory.read",
+      "description": "Read bounded container working-set memory evidence in bytes, with Unix epoch-second sample timestamps, for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "sum(container_memory_working_set_bytes{managed_cluster_name=\"<name>\",container!=\"\",container!=\"POD\"})"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "compute_memory_working_set_bytes",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.network.traffic.read",
+      "description": "Read bounded aggregate container-network traffic evidence in bytes per second, with Unix epoch-second sample timestamps, for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "sum(rate(container_network_receive_bytes_total{managed_cluster_name=\"<name>\",pod!=\"\"}[5m])) + sum(rate(container_network_transmit_bytes_total{managed_cluster_name=\"<name>\",pod!=\"\"}[5m]))"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "network_traffic_bytes_per_second",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.network.errors.read",
+      "description": "Read bounded aggregate container-network error evidence in errors per second, with Unix epoch-second sample timestamps, for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "sum(rate(container_network_receive_errors_total{managed_cluster_name=\"<name>\",pod!=\"\"}[5m])) + sum(rate(container_network_transmit_errors_total{managed_cluster_name=\"<name>\",pod!=\"\"}[5m]))"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "network_errors_per_second",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "observability.workload.restarts.read",
+      "description": "Read bounded workload restart evidence as the aggregate restart increase over each trailing five-minute sample window, with Unix epoch-second sample timestamps, for the connected target.",
+      "provider_bindings": [
+        {
+          "provider_name": "obs-mcp",
+          "tool_name": "execute_range_query",
+          "priority": 100,
+          "read_only": true,
+          "argument_bindings": [
+            {
+              "tool_argument_name": "query",
+              "source": "fixed",
+              "fixed_value": "sum(increase(kube_pod_container_status_restarts_total{managed_cluster_name=\"<name>\"}[5m]))"
+            },
+            {
+              "tool_argument_name": "step",
+              "source": "fixed",
+              "fixed_value": "1m"
+            },
+            {
+              "tool_argument_name": "duration",
+              "source": "semantic",
+              "semantic_argument_names": [
+                "time_window"
+              ],
+              "semantic_argument_patterns": {
+                "time_window": "(?:15m|30m|1h)"
+              },
+              "required": true
+            }
+          ],
+          "result_binding": {
+            "content_source": "structured_content",
+            "content_media_type": null,
+            "content_block_index": null,
+            "json_pointer": "/result",
+            "operation": "select",
+            "output_field": "workload_restart_count_five_minute_window",
+            "evidence_tool_argument_names": [
+              "step",
+              "duration"
+            ],
+            "maximum_response_characters": 250000,
+            "maximum_collection_items": 100
+          }
+        }
+      ]
+    }
+  ]
+}
