@@ -1,5 +1,3 @@
-"""Tests for snapshot-driven live MCP execution using fake SDK modules."""
-
 import sys
 import unittest
 from types import ModuleType, SimpleNamespace
@@ -27,13 +25,13 @@ from mosaic.models.capabilities.capability_result_binding import (
 from mosaic.models.capabilities.mcp_provider_configuration import (
     McpProviderConfiguration,
 )
+from mosaic.models.capabilities.provider_routing_configuration import (
+    ProviderRoutingConfiguration,
+)
 
 
 class TestLiveMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
-    """Verify generic allowlisted invocation and compact evidence."""
-
     async def test_declared_collection_is_counted_behind_gateway(self) -> None:
-        """Raw MCP data is reduced according to external-style metadata."""
         tool = SimpleNamespace(
             name='objects_list',
             run_async=AsyncMock(
@@ -111,7 +109,6 @@ class TestLiveMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_oversized_evidence_has_an_explicit_outcome(self) -> None:
-        """A governed evidence limit is distinct from processing failure."""
         tool = SimpleNamespace(
             name='objects_list',
             run_async=AsyncMock(
@@ -157,13 +154,16 @@ class TestLiveMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
         self,
         maximum_response_characters: int = 1000,
     ) -> McpExecutionGateway:
-        """Create a generic live gateway without importing local SDKs."""
         configuration = McpProviderConfiguration(
             provider_name='inventory-mcp',
+            provider_type='inventory',
             transport='streamable_http',
             header_strategy='ada_request_context',
             base_url='https://inventory.example/mcp',
             allowed_tool_names=('objects_list',),
+            routing=ProviderRoutingConfiguration(
+                mode='target_independent',
+            ),
         )
         capability = Capability(
             name='inventory.objects.count',
@@ -218,7 +218,6 @@ class TestLiveMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
         )
 
     def _context(self) -> SimpleNamespace:
-        """Create a minimal ADK-like context for the fake MCP tool."""
         return SimpleNamespace(
             invocation_id='invocation-1',
             session=SimpleNamespace(id='test-session'),
@@ -229,7 +228,6 @@ class TestLiveMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
         self,
         toolset: SimpleNamespace,
     ) -> dict[str, object]:
-        """Build fake lazy-import modules and inspectable constructors."""
         get_headers = Mock(name='get_headers')
         header_provider_constructor = Mock(
             return_value=SimpleNamespace(get_headers=get_headers)

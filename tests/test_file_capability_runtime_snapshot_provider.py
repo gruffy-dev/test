@@ -1,5 +1,3 @@
-"""Tests for external capability-runtime snapshot loading."""
-
 import json
 import tempfile
 import unittest
@@ -17,13 +15,11 @@ from mosaic.models.capabilities.capability_runtime_snapshot_configuration import
 
 
 class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):
-    """Verify snapshots are complete, cross-referenced, and fail closed."""
-
     def test_valid_snapshot_is_loaded(self) -> None:
-        """External provider and capability metadata load as one snapshot."""
         snapshot = self._load(self._snapshot_data())
 
         self.assertEqual(snapshot.snapshot_id, 'inventory-2026.08.24')
+        self.assertEqual(snapshot.targets[0].id, 'inventory/warehouse1')
         self.assertEqual(snapshot.providers[0].provider_name, 'inventory-mcp')
         self.assertEqual(
             snapshot.capabilities[0].name,
@@ -31,7 +27,6 @@ class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):
         )
 
     def test_non_allowlisted_binding_is_rejected(self) -> None:
-        """A capability cannot smuggle in an undeclared concrete tool."""
         snapshot_data = self._snapshot_data()
         snapshot_data['capabilities'][0]['provider_bindings'][0][
             'tool_name'
@@ -40,8 +35,50 @@ class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'failed validation'):
             self._load(snapshot_data)
 
+    def test_unknown_provider_target_is_rejected(self) -> None:
+        snapshot_data = self._snapshot_data()
+        snapshot_data['providers'][0]['routing']['target_id'] = (
+            'inventory/missing'
+        )
+
+        with self.assertRaisesRegex(RuntimeError, 'failed validation'):
+            self._load(snapshot_data)
+
+    def test_duplicate_alias_within_vertical_is_rejected(self) -> None:
+        snapshot_data = self._snapshot_data()
+        snapshot_data['targets'].append(
+            {
+                'id': 'inventory/warehouse2',
+                'display_name': 'Secondary warehouse',
+                'aliases': ['WAREHOUSE'],
+            }
+        )
+
+        with self.assertRaisesRegex(RuntimeError, 'failed validation'):
+            self._load(snapshot_data)
+
+    def test_duplicate_alias_across_verticals_is_accepted(self) -> None:
+        snapshot_data = self._snapshot_data()
+        snapshot_data['targets'].append(
+            {
+                'id': 'databases/warehouse1',
+                'display_name': 'Warehouse database',
+                'aliases': ['warehouse'],
+            }
+        )
+
+        snapshot = self._load(snapshot_data)
+
+        self.assertEqual(len(snapshot.targets), 2)
+
+    def test_legacy_snapshot_schema_is_rejected(self) -> None:
+        snapshot_data = self._snapshot_data()
+        snapshot_data['schema_version'] = 1
+
+        with self.assertRaisesRegex(RuntimeError, 'failed validation'):
+            self._load(snapshot_data)
+
     def test_deployment_result_ceilings_are_enforced(self) -> None:
-        """Bindings cannot raise deployment-wide evidence safety ceilings."""
         scenarios = (
             ('maximum_response_characters', 10001, 'response limit'),
             ('maximum_collection_items', 101, 'collection limit'),
@@ -64,17 +101,6 @@ class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):
         self,
         snapshot_data: dict[str, object],
     ) -> CapabilityRuntimeSnapshot:
-        """Write and load one isolated external snapshot fixture.
-
-        Args:
-            snapshot_data: Complete JSON-compatible snapshot document.
-
-        Returns:
-            Validated immutable capability-runtime snapshot.
-
-        Raises:
-            RuntimeError: If the supplied snapshot fails governed validation.
-        """
         with tempfile.TemporaryDirectory() as temporary_directory:
             snapshot_path = Path(temporary_directory) / 'snapshot.json'
             snapshot_path.write_text(
@@ -92,17 +118,28 @@ class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):
             return provider.load()
 
     def _snapshot_data(self) -> dict[str, object]:
-        """Return a server-neutral snapshot document fixture."""
         return {
-            'schema_version': 1,
+            'schema_version': 2,
             'snapshot_id': 'inventory-2026.08.24',
+            'targets': [
+                {
+                    'id': 'inventory/warehouse1',
+                    'display_name': 'Primary warehouse',
+                    'aliases': ['warehouse', 'primary'],
+                }
+            ],
             'providers': [
                 {
                     'provider_name': 'inventory-mcp',
+                    'provider_type': 'inventory',
                     'transport': 'streamable_http',
                     'header_strategy': 'ada_request_context',
                     'base_url': 'https://inventory.example/mcp',
                     'allowed_tool_names': ['objects_list'],
+                    'routing': {
+                        'mode': 'endpoint_per_target',
+                        'target_id': 'inventory/warehouse1',
+                    },
                 }
             ],
             'capabilities': [
