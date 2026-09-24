@@ -3,34 +3,18 @@ import unittest
 from types import ModuleType, SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
-from mosaic.components.capabilities.ada_mcp_capability_provider_invoker import (
-    AdaMcpCapabilityProviderInvoker,
-)
-from mosaic.components.capabilities.capability_catalogue_and_resolver import (
-    CapabilityCatalogueAndResolver,
-)
-from mosaic.components.capabilities.mcp_execution_gateway import (
-    McpExecutionGateway,
-)
+from mosaic.components.capabilities.ada_mcp_capability_provider_invoker import AdaMcpCapabilityProviderInvoker
+from mosaic.components.capabilities.capability_catalogue_and_resolver import CapabilityCatalogueAndResolver
+from mosaic.components.capabilities.mcp_execution_gateway import MCPExecutionGateway
 from mosaic.models.capabilities.capability import Capability
-from mosaic.models.capabilities.capability_argument_binding import (
-    CapabilityArgumentBinding,
-)
-from mosaic.models.capabilities.capability_provider_binding import (
-    CapabilityProviderBinding,
-)
-from mosaic.models.capabilities.capability_result_binding import (
-    CapabilityResultBinding,
-)
-from mosaic.models.capabilities.mcp_provider_configuration import (
-    McpProviderConfiguration,
-)
-from mosaic.models.capabilities.provider_routing_configuration import (
-    ProviderRoutingConfiguration,
-)
+from mosaic.models.capabilities.capability_argument_binding import CapabilityArgumentBinding
+from mosaic.models.capabilities.capability_provider_binding import CapabilityProviderBinding
+from mosaic.models.capabilities.capability_result_binding import CapabilityResultBinding
+from mosaic.models.capabilities.mcp_provider_configuration import McpProviderConfiguration
+from mosaic.models.capabilities.provider_routing_configuration import ProviderRoutingConfiguration
 
 
-class TestLiveMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
+class TestLiveMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
     async def test_declared_collection_is_counted_behind_gateway(self) -> None:
         tool = SimpleNamespace(
             name='objects_list',
@@ -153,7 +137,7 @@ class TestLiveMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
     def _gateway(
         self,
         maximum_response_characters: int = 1000,
-    ) -> McpExecutionGateway:
+    ) -> MCPExecutionGateway:
         configuration = McpProviderConfiguration(
             provider_name='inventory-mcp',
             provider_type='inventory',
@@ -207,7 +191,7 @@ class TestLiveMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
                 ),
             ),
         )
-        return McpExecutionGateway(
+        return MCPExecutionGateway(
             capability_catalogue_and_resolver=CapabilityCatalogueAndResolver(
                 capabilities=(capability,),
             ),

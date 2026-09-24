@@ -2,12 +2,8 @@ import unittest
 
 from pydantic import ValidationError
 
-from mosaic.models.capabilities.provider_routing_configuration import (
-    ProviderRoutingConfiguration,
-)
-from mosaic.models.capabilities.provider_target_binding import (
-    ProviderTargetBinding,
-)
+from mosaic.models.capabilities.provider_routing_configuration import ProviderRoutingConfiguration
+from mosaic.models.capabilities.provider_target_binding import ProviderTargetBinding
 
 
 class TestProviderRoutingConfiguration(unittest.TestCase):

@@ -2,12 +2,8 @@ import unittest
 
 from pydantic import ValidationError
 
-from mosaic.models.capabilities.mcp_provider_configuration import (
-    McpProviderConfiguration,
-)
-from mosaic.models.capabilities.provider_routing_configuration import (
-    ProviderRoutingConfiguration,
-)
+from mosaic.models.capabilities.mcp_provider_configuration import McpProviderConfiguration
+from mosaic.models.capabilities.provider_routing_configuration import ProviderRoutingConfiguration
 
 
 class TestMcpProviderConfiguration(unittest.TestCase):

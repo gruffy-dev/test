@@ -3,15 +3,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from mosaic.components.capabilities.file_capability_runtime_snapshot_provider import (
-    FileCapabilityRuntimeSnapshotProvider,
-)
-from mosaic.models.capabilities.capability_runtime_snapshot import (
-    CapabilityRuntimeSnapshot,
-)
-from mosaic.models.capabilities.capability_runtime_snapshot_configuration import (
-    CapabilityRuntimeSnapshotConfiguration,
-)
+from mosaic.components.capabilities.file_capability_runtime_snapshot_provider import FileCapabilityRuntimeSnapshotProvider
+from mosaic.models.capabilities.capability_runtime_snapshot import CapabilityRuntimeSnapshot
+from mosaic.models.capabilities.capability_runtime_snapshot_configuration import CapabilityRuntimeSnapshotConfiguration
 
 
 class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):

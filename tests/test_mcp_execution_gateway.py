@@ -1,27 +1,14 @@
-"""Tests for governed execution through deterministic mock providers."""
-
 import unittest
 from types import SimpleNamespace
 
-from mosaic.components.capabilities.capability_catalogue_and_resolver import (
-    CapabilityCatalogueAndResolver,
-)
-from mosaic.components.capabilities.mcp_execution_gateway import (
-    McpExecutionGateway,
-)
-from mosaic.mocks.mock_ada_capability_catalogue import (
-    MockAdaCapabilityCatalogue,
-)
-from mosaic.mocks.mock_capability_provider_invoker import (
-    MockCapabilityProviderInvoker,
-)
+from mosaic.components.capabilities.capability_catalogue_and_resolver import CapabilityCatalogueAndResolver
+from mosaic.components.capabilities.mcp_execution_gateway import MCPExecutionGateway
+from mosaic.mocks.mock_ada_capability_catalogue import MockAdaCapabilityCatalogue
+from mosaic.mocks.mock_capability_provider_invoker import MockCapabilityProviderInvoker
 
 
-class TestMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
-    """Verify semantic capability bindings and deterministic mock evidence."""
-
+class TestMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
     async def test_openshift_events_are_available(self) -> None:
-        """The OpenShift skill can collect its required event evidence."""
         result = await self._create_gateway().execute_capability(
             capability_name='openshift.events.read',
             semantic_arguments={
@@ -42,7 +29,6 @@ class TestMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
             )
 
     async def test_database_runbook_can_be_searched_and_read(self) -> None:
-        """Search evidence supplies the identity used by exact retrieval."""
         gateway = self._create_gateway()
         search_result = await gateway.execute_capability(
             capability_name='database.runbook.search',
@@ -71,14 +57,9 @@ class TestMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(runbook['runbook_id'], 'DB-RB-0042')
                 self.assertEqual(runbook['version'], '3.1.0')
 
-    def _create_gateway(self) -> McpExecutionGateway:
-        """Create the governed gateway with all deterministic mock bindings.
-
-        Returns:
-            Gateway configured with the complete mock capability catalogue.
-        """
+    def _create_gateway(self) -> MCPExecutionGateway:
         mock_catalogue = MockAdaCapabilityCatalogue.create()
-        return McpExecutionGateway(
+        return MCPExecutionGateway(
             capability_catalogue_and_resolver=CapabilityCatalogueAndResolver(
                 capabilities=mock_catalogue.capabilities,
             ),
@@ -86,7 +67,6 @@ class TestMcpExecutionGateway(unittest.IsolatedAsyncioTestCase):
         )
 
     def _context(self) -> SimpleNamespace:
-        """Create the minimal context ignored by deterministic providers."""
         return SimpleNamespace(
             invocation_id='invocation-1',
             session=SimpleNamespace(id='test-session'),
