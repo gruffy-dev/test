@@ -77,6 +77,36 @@ class TestCapabilityDiscoveryService(unittest.TestCase):
         self.assertEqual(result['capabilities'], [])
         self.assertEqual(result['required_target_verticals'], ['openshift'])
 
+    def test_optional_target_aware_capability_requires_a_target(self) -> None:
+        service = self._create_service()
+        context = self._context(
+            required_capability_names=(),
+            optional_capability_names=('openshift.events.read',),
+        )
+
+        result = service.discover_capabilities(context)
+
+        self.assertEqual(result['status'], 'target_required')
+        self.assertEqual(result['required_target_verticals'], ['openshift'])
+
+    def test_unknown_inferred_target_is_rejected_for_optional_capability(
+        self,
+    ) -> None:
+        service = self._create_service()
+        context = self._context(
+            required_capability_names=(),
+            optional_capability_names=('openshift.events.read',),
+        )
+
+        result = service.discover_capabilities(
+            context,
+            target_name='openshift',
+        )
+
+        self.assertEqual(result['status'], 'target_unknown')
+        self.assertEqual(result['capabilities'], [])
+        self.assertEqual(result['required_target_verticals'], ['openshift'])
+
     def test_explicit_target_is_resolved_and_reused(self) -> None:
         service = self._create_service()
         context = self._context(
