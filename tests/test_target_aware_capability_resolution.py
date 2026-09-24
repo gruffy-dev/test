@@ -18,14 +18,8 @@ class TestTargetAwareCapabilityResolution(unittest.TestCase):
                     description='Read platform status.',
                     provider_bindings=(
                         CapabilityProviderBinding(
-                            provider_name='platform-one',
+                            provider_type='platform',
                             tool_name='status_read',
-                            priority=10,
-                        ),
-                        CapabilityProviderBinding(
-                            provider_name='platform-two',
-                            tool_name='status_read',
-                            priority=20,
                         ),
                     ),
                 ),
@@ -83,7 +77,7 @@ class TestTargetAwareCapabilityResolution(unittest.TestCase):
                     description='Read platform resources.',
                     provider_bindings=(
                         CapabilityProviderBinding(
-                            provider_name='shared-platform',
+                            provider_type='platform',
                             tool_name='resources_list',
                             argument_bindings=(
                                 CapabilityArgumentBinding(

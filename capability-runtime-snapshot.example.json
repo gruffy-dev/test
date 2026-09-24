@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "snapshot_id": "example-v2",
+  "schema_version": 3,
+  "snapshot_id": "example-v3",
   "targets": [],
   "providers": [
     {
@@ -23,7 +23,7 @@
       "description": "Count objects within one explicitly supplied scope.",
       "provider_bindings": [
         {
-          "provider_name": "inventory-mcp",
+          "provider_type": "inventory",
           "tool_name": "objects_list",
           "priority": 100,
           "read_only": true,

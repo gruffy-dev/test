@@ -155,7 +155,7 @@ class TestLiveMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
             description='Count externally managed objects in one scope.',
             provider_bindings=(
                 CapabilityProviderBinding(
-                    provider_name='inventory-mcp',
+                    provider_type='inventory',
                     tool_name='objects_list',
                     argument_bindings=(
                         CapabilityArgumentBinding(

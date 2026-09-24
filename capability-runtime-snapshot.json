@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "snapshot_id": "local-container-platform-observability-read-v8",
+  "schema_version": 3,
+  "snapshot_id": "local-container-platform-observability-read-v9",
   "targets": [
     {
       "id": "openshift/cluster1",
@@ -49,7 +49,7 @@
       "description": "Count running Kubernetes pods in one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -102,7 +102,7 @@
       "description": "Read bounded Kubernetes pod status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -150,7 +150,7 @@
       "description": "Read bounded Kubernetes event evidence from one explicitly supplied namespace, optionally narrowed to one affected resource name.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -210,7 +210,7 @@
       "description": "Read a bounded tail of logs from one explicitly supplied Kubernetes pod.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "pods_log",
           "priority": 100,
           "read_only": true,
@@ -281,7 +281,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes pod.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -341,7 +341,7 @@
       "description": "Read bounded HTTP response-rate evidence grouped by response class for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,
@@ -390,7 +390,7 @@
       "description": "Read bounded HTTP response-latency evidence in milliseconds, with sample timestamps represented as Unix epoch seconds, for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,
@@ -439,7 +439,7 @@
       "description": "Read bounded HTTP backend connection-error-rate evidence for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,
@@ -488,7 +488,7 @@
       "description": "Read bounded Kubernetes Deployment status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -536,7 +536,7 @@
       "description": "Read bounded Kubernetes ReplicaSet status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -584,7 +584,7 @@
       "description": "Read bounded Kubernetes StatefulSet status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -632,7 +632,7 @@
       "description": "Read bounded Kubernetes DaemonSet status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -680,7 +680,7 @@
       "description": "Read bounded Kubernetes Job status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -728,7 +728,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes Deployment.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -788,7 +788,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes ReplicaSet.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -848,7 +848,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes StatefulSet.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -908,7 +908,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes DaemonSet.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -968,7 +968,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes Job.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1028,7 +1028,7 @@
       "description": "Read bounded Kubernetes Service evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1076,7 +1076,7 @@
       "description": "Read bounded Kubernetes Endpoints evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1124,7 +1124,7 @@
       "description": "Read bounded Kubernetes Ingress status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1172,7 +1172,7 @@
       "description": "Read bounded OpenShift Route status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1220,7 +1220,7 @@
       "description": "Read bounded Kubernetes NetworkPolicy evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1268,7 +1268,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes Service.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1328,7 +1328,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes Endpoints object.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1388,7 +1388,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes Ingress.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1448,7 +1448,7 @@
       "description": "Read complete structured details for one explicitly identified OpenShift Route.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1508,7 +1508,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes NetworkPolicy.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1568,7 +1568,7 @@
       "description": "Read bounded Kubernetes PersistentVolumeClaim status evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1616,7 +1616,7 @@
       "description": "Read bounded cluster-scoped Kubernetes PersistentVolume status evidence.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1651,7 +1651,7 @@
       "description": "Read bounded cluster-scoped Kubernetes StorageClass evidence.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1686,7 +1686,7 @@
       "description": "Read bounded cluster-scoped Kubernetes VolumeAttachment status evidence.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1721,7 +1721,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes PersistentVolumeClaim.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1781,7 +1781,7 @@
       "description": "Read complete structured details for one explicitly identified cluster-scoped Kubernetes PersistentVolume.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1829,7 +1829,7 @@
       "description": "Read complete structured details for one explicitly identified cluster-scoped Kubernetes VolumeAttachment.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -1877,7 +1877,7 @@
       "description": "Read bounded cluster-scoped Kubernetes Node status evidence.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1912,7 +1912,7 @@
       "description": "Read bounded Kubernetes ResourceQuota evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -1960,7 +1960,7 @@
       "description": "Read bounded Kubernetes LimitRange evidence from one explicitly supplied namespace.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -2008,7 +2008,7 @@
       "description": "Read complete structured details for one explicitly identified cluster-scoped Kubernetes Node.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -2056,7 +2056,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes ResourceQuota.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -2116,7 +2116,7 @@
       "description": "Read complete structured details for one explicitly identified Kubernetes LimitRange.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -2176,7 +2176,7 @@
       "description": "Read bounded cluster-scoped OpenShift ClusterOperator status evidence.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -2211,7 +2211,7 @@
       "description": "Read bounded cluster-scoped OpenShift ClusterVersion status evidence.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -2246,7 +2246,7 @@
       "description": "Read bounded cluster-scoped OpenShift MachineConfigPool status evidence.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_list",
           "priority": 100,
           "read_only": true,
@@ -2281,7 +2281,7 @@
       "description": "Read complete structured details for one explicitly identified cluster-scoped OpenShift ClusterOperator.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -2329,7 +2329,7 @@
       "description": "Read complete structured details for one explicitly identified cluster-scoped OpenShift ClusterVersion.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -2377,7 +2377,7 @@
       "description": "Read complete structured details for one explicitly identified cluster-scoped OpenShift MachineConfigPool.",
       "provider_bindings": [
         {
-          "provider_name": "kubernetes-mcp",
+          "provider_type": "kubernetes",
           "tool_name": "resources_get",
           "priority": 100,
           "read_only": true,
@@ -2425,7 +2425,7 @@
       "description": "Read bounded current HTTP backend session evidence, represented as a session count with Unix epoch-second sample timestamps, for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,
@@ -2474,7 +2474,7 @@
       "description": "Read bounded container CPU usage-rate evidence, represented as consumed CPU cores with Unix epoch-second sample timestamps, for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,
@@ -2523,7 +2523,7 @@
       "description": "Read bounded container working-set memory evidence in bytes, with Unix epoch-second sample timestamps, for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,
@@ -2572,7 +2572,7 @@
       "description": "Read bounded aggregate container-network traffic evidence in bytes per second, with Unix epoch-second sample timestamps, for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,
@@ -2621,7 +2621,7 @@
       "description": "Read bounded aggregate container-network error evidence in errors per second, with Unix epoch-second sample timestamps, for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,
@@ -2670,7 +2670,7 @@
       "description": "Read bounded workload restart evidence as the aggregate restart increase over each trailing five-minute sample window, with Unix epoch-second sample timestamps, for the connected target.",
       "provider_bindings": [
         {
-          "provider_name": "obs-mcp",
+          "provider_type": "observability",
           "tool_name": "execute_range_query",
           "priority": 100,
           "read_only": true,

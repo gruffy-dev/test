@@ -65,9 +65,22 @@ class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):
 
         self.assertEqual(len(snapshot.targets), 2)
 
+    def test_ambiguous_provider_type_and_target_is_rejected(self) -> None:
+        snapshot_data = self._snapshot_data()
+        duplicate_provider = dict(snapshot_data['providers'][0])
+        duplicate_provider['provider_name'] = 'inventory-mcp-duplicate'
+        duplicate_provider['base_url'] = 'https://duplicate.example/mcp'
+        duplicate_provider['routing'] = dict(
+            snapshot_data['providers'][0]['routing']
+        )
+        snapshot_data['providers'].append(duplicate_provider)
+
+        with self.assertRaisesRegex(RuntimeError, 'failed validation'):
+            self._load(snapshot_data)
+
     def test_legacy_snapshot_schema_is_rejected(self) -> None:
         snapshot_data = self._snapshot_data()
-        snapshot_data['schema_version'] = 1
+        snapshot_data['schema_version'] = 2
 
         with self.assertRaisesRegex(RuntimeError, 'failed validation'):
             self._load(snapshot_data)
@@ -113,7 +126,7 @@ class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):
 
     def _snapshot_data(self) -> dict[str, object]:
         return {
-            'schema_version': 2,
+            'schema_version': 3,
             'snapshot_id': 'inventory-2026.08.24',
             'targets': [
                 {
@@ -142,7 +155,7 @@ class TestFileCapabilityRuntimeSnapshotProvider(unittest.TestCase):
                     'description': 'Count objects in one scope.',
                     'provider_bindings': [
                         {
-                            'provider_name': 'inventory-mcp',
+                            'provider_type': 'inventory',
                             'tool_name': 'objects_list',
                             'argument_bindings': [
                                 {
