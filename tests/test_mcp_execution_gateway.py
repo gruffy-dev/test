@@ -3,9 +3,9 @@ from types import SimpleNamespace
 
 from mosaic.components.capabilities.capability_catalogue_and_resolver import CapabilityCatalogueAndResolver
 from mosaic.components.capabilities.mcp_execution_gateway import MCPExecutionGateway
-from mosaic.components.orchestration.ada_session_target_context_store import AdaSessionTargetContextStore
 from mosaic.mocks.mock_ada_capability_catalogue import MockAdaCapabilityCatalogue
 from mosaic.mocks.mock_capability_provider_invoker import MockCapabilityProviderInvoker
+from mosaic.models.orchestration.orchestration_state import OrchestrationState
 
 
 class TestMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
@@ -20,6 +20,7 @@ class TestMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
         )
 
         self.assertEqual(result['status'], 'success')
+        self.assertEqual(result['target_id'], 'openshift/dev')
         evidence = result['evidence']
         self.assertIsInstance(evidence, dict)
         if isinstance(evidence, dict):
@@ -66,7 +67,6 @@ class TestMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
                 providers=mock_catalogue.providers,
             ),
             provider_invoker=MockCapabilityProviderInvoker(),
-            session_target_context_store=AdaSessionTargetContextStore(),
         )
 
     def _context(self) -> SimpleNamespace:
@@ -74,10 +74,14 @@ class TestMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
             invocation_id='invocation-1',
             session=SimpleNamespace(id='test-session'),
             state={
-                'mosaic:session-target': {
-                    'schema_version': 1,
-                    'target_id': 'openshift/dev',
-                }
+                'mosaic:orchestration': OrchestrationState.start(
+                    'invocation-1'
+                ).model_copy(
+                    update={
+                        'target_id': 'openshift/dev',
+                        'target_display_name': 'Development OpenShift',
+                    }
+                ).model_dump(mode='json')
             },
         )
 

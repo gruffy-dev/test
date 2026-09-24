@@ -6,7 +6,6 @@ from unittest.mock import AsyncMock, Mock, patch
 from mosaic.components.capabilities.ada_mcp_capability_provider_invoker import AdaMcpCapabilityProviderInvoker
 from mosaic.components.capabilities.capability_catalogue_and_resolver import CapabilityCatalogueAndResolver
 from mosaic.components.capabilities.mcp_execution_gateway import MCPExecutionGateway
-from mosaic.components.orchestration.ada_session_target_context_store import AdaSessionTargetContextStore
 from mosaic.models.capabilities.capability import Capability
 from mosaic.models.capabilities.capability_argument_binding import CapabilityArgumentBinding
 from mosaic.models.capabilities.capability_provider_binding import CapabilityProviderBinding
@@ -201,7 +200,6 @@ class TestLiveMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
                 configuration=configuration,
                 agent_identifier='mosaic-test',
             ),
-            session_target_context_store=AdaSessionTargetContextStore(),
         )
 
     def _context(self) -> SimpleNamespace:
