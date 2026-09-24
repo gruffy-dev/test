@@ -166,9 +166,10 @@ class TestStructuredOutputValidator(unittest.TestCase):
                 catalogue_snapshot=snapshot,
             )
         )
-        orchestration_state = OrchestrationState.start(
+        initial_orchestration_state = OrchestrationState.start(
             'invocation-1'
-        ).model_copy(
+        )
+        orchestration_state = initial_orchestration_state.model_copy(
             update={
                 'phase': 'executing',
                 'skill_discovery_completed': True,
@@ -177,9 +178,15 @@ class TestStructuredOutputValidator(unittest.TestCase):
                 'requested_skill_names': loaded_skill_names,
                 'loaded_skill_names': loaded_skill_names,
                 'required_capability_names': required_capability_names,
-                'required_capability_outcomes': (
-                    required_capability_outcomes or {}
-                ),
+                'required_capability_outcome_records': {
+                    capability_name: (
+                        initial_orchestration_state.goal_id,
+                        outcome,
+                    )
+                    for capability_name, outcome in (
+                        required_capability_outcomes or {}
+                    ).items()
+                },
             }
         )
         context = SimpleNamespace(
