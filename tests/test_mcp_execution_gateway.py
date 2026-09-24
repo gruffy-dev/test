@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 from mosaic.components.capabilities.capability_catalogue_and_resolver import CapabilityCatalogueAndResolver
 from mosaic.components.capabilities.mcp_execution_gateway import MCPExecutionGateway
+from mosaic.components.orchestration.ada_session_target_context_store import AdaSessionTargetContextStore
 from mosaic.mocks.mock_ada_capability_catalogue import MockAdaCapabilityCatalogue
 from mosaic.mocks.mock_capability_provider_invoker import MockCapabilityProviderInvoker
 
@@ -62,15 +63,22 @@ class TestMCPExecutionGateway(unittest.IsolatedAsyncioTestCase):
         return MCPExecutionGateway(
             capability_catalogue_and_resolver=CapabilityCatalogueAndResolver(
                 capabilities=mock_catalogue.capabilities,
+                providers=mock_catalogue.providers,
             ),
             provider_invoker=MockCapabilityProviderInvoker(),
+            session_target_context_store=AdaSessionTargetContextStore(),
         )
 
     def _context(self) -> SimpleNamespace:
         return SimpleNamespace(
             invocation_id='invocation-1',
             session=SimpleNamespace(id='test-session'),
-            state={},
+            state={
+                'mosaic:session-target': {
+                    'schema_version': 1,
+                    'target_id': 'openshift/dev',
+                }
+            },
         )
 
 
