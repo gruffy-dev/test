@@ -520,43 +520,46 @@ tenancy, RBAC, and frontend services.
 
 #### Temporary MVP configuration
 
-Skill profiles and their Session assignments are currently supplied through
-deployment environment variables:
+The MVP defines Skill profiles through deployment environment variables. The
+current demonstration configuration follows this pattern; the Skill list is
+shortened here for readability:
 
 ```text
-MOSAIC_SKILLS_PROFILES={"platform-baseline":["inspect-container-platform-workloads"],"platform-investigation":["inspect-container-platform-workloads","investigate-workload-degradation"]}
-MOSAIC_SKILLS_DEFAULT_PROFILE_ID=platform-baseline
-MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS={"example-session":"platform-investigation"}
+MOSAIC_SKILLS_PROFILES={"mvp-demo":["inspect-container-platform-workloads","investigate-workload-degradation"]}
+MOSAIC_SKILLS_DEFAULT_PROFILE_ID=mvp-demo
+MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS={}
 ```
 
-`platform-baseline` and `platform-investigation` are example profile identifiers
-chosen by the MOSAIC administrator. They are not built-in profiles, roles,
-Skills, or permission levels. A Skill profile is simply a named allowlist of
-Skills; administrators may choose different profile identifiers and contents.
-
-| Environment variable | Temporary MVP purpose |
+| Environment variable | Meaning in the current configuration |
 | --- | --- |
-| `MOSAIC_SKILLS_PROFILES` | A JSON object that defines the available Skill profiles. Each key is a profile identifier and each value is the list of globally unique Skill names authorised by that profile. Every referenced Skill must exist in the active Skill catalogue. |
-| `MOSAIC_SKILLS_DEFAULT_PROFILE_ID` | The profile assigned to every Session that does not have an explicit entry in `MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS`. Its value must identify a profile declared in `MOSAIC_SKILLS_PROFILES`. |
-| `MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS` | A JSON object that maps exact ADA Session identifiers to profile identifiers declared in `MOSAIC_SKILLS_PROFILES`. It assigns a complete Skill profile to a Session; it does not list Skills directly. |
+| `MOSAIC_SKILLS_PROFILES` | Defines a profile named `mvp-demo`. Its array is the complete allowlist of globally unique Skill names available through that profile. Every listed Skill must exist in the active Skill catalogue. |
+| `MOSAIC_SKILLS_DEFAULT_PROFILE_ID` | Selects `mvp-demo` when an ADA Session has no explicit profile assignment. |
+| `MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS` | Provides optional overrides from existing ADA Session IDs to profile IDs. `{}` means that the current configuration has no Session-specific overrides. It does not create ADA Sessions or Session IDs. |
 
-In the example, the ADA Session named `example-session` receives the
-`platform-investigation` profile. It can use both listed Skills. Every other
-Session receives the `platform-baseline` profile through
-`MOSAIC_SKILLS_DEFAULT_PROFILE_ID` and can use only
-`inspect-container-platform-workloads`.
+The resulting behaviour is:
 
-MOSAIC resolves this assignment from the current ADA Session identifier and
-places the resulting Skill profile in Session state. The trusted deployment
-configuration is re-evaluated on each agent invocation, so a caller-supplied
-Session-state value cannot grant a different profile or additional Skills.
-Changes to these environment variables take effect when the MOSAIC runtime is
-restarted with the new configuration.
+1. A client or the ADA development UI establishes an ADA Session ID.
+2. ADA exposes that existing ID to MOSAIC as part of the invocation context.
+3. MOSAIC looks for the ID in `MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS`.
+4. The current `{}` value contains no match, so MOSAIC uses the `mvp-demo`
+   fallback named by `MOSAIC_SKILLS_DEFAULT_PROFILE_ID`.
+5. MOSAIC looks up `mvp-demo` in `MOSAIC_SKILLS_PROFILES` and authorises the
+   Skills in its array for that Session.
+
+Consequently, every Session in the current demonstration receives the same
+`mvp-demo` Skill profile. The profile controls which Skills the Session may
+discover and load; it does not automatically load or execute every listed
+Skill.
 
 This is a temporary MVP mechanism tightly coupled to runtime deployment. It is
 managed by platform administrators rather than individual users, and it is not
 a replacement for authenticated identity, user or tenant ownership,
-resource-level authorisation, or a durable Skill profile service.
+resource-level authorisation, or a durable Skill profile service. A future
+trusted frontend and backend will establish and validate Session ownership and
+resolve Skill access from identity, workspace membership, and RBAC. Session IDs
+will be opaque routing references rather than proof of identity or permission.
+Changes to the temporary environment configuration require a MOSAIC runtime
+restart.
 
 The MVP does not yet provide workspace-scoped Target visibility. Compatible
 Targets are derived from the Capabilities declared by loaded Skills and the
