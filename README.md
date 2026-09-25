@@ -1,25 +1,80 @@
 # MOSAIC
 
-MOSAIC is a governed enterprise agent for investigating operational systems
-through approved procedures and tools. It combines general language-model
-reasoning with versioned **skills**, semantic **capabilities**, and controlled
-Model Context Protocol (MCP) providers.
+**Make the organisation's best operational expertise available wherever it is
+needed.**
 
-MOSAIC is currently an MVP under active development. Its strongest working
-path is read-only investigation of container platforms and observability data.
-It also contains demonstration skills for IBM MQ diagnosis, database-runbook
-matching, structured JSON output, and non-technical summaries.
+MOSAIC is an investment in organisational capacity. It turns specialist
+knowledge from a scarce, person-dependent resource into a governed capability
+that can be reused across teams, systems, and business services.
 
-> **Important:** the current live-provider setup is a single-user development
-> demonstration. It does not yet provide production-grade authentication,
-> tenant isolation, delegated MCP authorization, or resource-level RBAC.
+For a user, the promise is simple: start with the problem, not with the tool.
+Instead of finding the right dashboard, learning a provider query language,
+locating a runbook, and waiting for the right specialist, the user can ask for
+the outcome they need and receive a consistent, evidence-based response.
 
-## The problem MOSAIC addresses
+For the organisation, this creates a more fundamental shift. Experts can
+capture what good investigation looks like once. Platform teams can make
+trusted operational evidence available once. That combined value can then be
+reused by many teams without multiplying integrations, duplicating guidance,
+or making every user an expert in the underlying technology.
 
-Enterprise support teams often have procedures in documents, diagnostic data
-behind several tools, and platform knowledge spread across specialist teams.
-A general-purpose AI assistant may be able to reason about a problem, but it
-does not inherently know:
+MOSAIC is therefore not another support chatbot. It is the beginning of a
+shared operational intelligence layer: a place where knowledge, evidence, and
+governance come together to help people make better decisions, faster.
+
+The MVP makes that future visible and useful now. Its initial read-only
+operational scenarios demonstrate the value with real platform evidence while
+establishing a foundation that can expand across technologies, teams, and
+business processes.
+
+## Why MOSAIC matters
+
+Operational expertise is enormously valuable, but traditional support models
+scale it linearly: more demand requires more specialist time. Knowledge remains
+distributed across individuals, runbooks, team conventions, and tools, while
+users lose time navigating organisational and technical boundaries before
+investigation can begin.
+
+MOSAIC is intended to break that dependency.
+
+| Organisational value | What changes |
+| --- | --- |
+| **More capacity from existing expertise** | Specialists spend less time repeatedly applying routine knowledge and more time on novel, high-value problems. |
+| **Shorter time to understanding** | Users reach relevant evidence without first navigating multiple teams, interfaces, and provider-specific languages. |
+| **Consistent quality at scale** | Every team can begin from the same approved investigative baseline, regardless of individual experience or time pressure. |
+| **Knowledge that survives organisational change** | Important operational practice becomes an owned, reusable asset rather than remaining in individual memory. |
+| **Lower cost of integration** | A platform or evidence source can support many use cases without a bespoke point-to-point assistant integration for each one. |
+| **Faster onboarding and self-service** | People can benefit from established expertise while they are still learning the organisation's systems and operating model. |
+| **Greater confidence in enterprise AI** | AI adoption can expand within visible operational and governance boundaries instead of relying on unrestricted model behaviour. |
+| **Freedom to evolve technology choices** | Operational knowledge remains useful when providers, endpoints, models, or presentation channels change. |
+
+The long-term result is a compounding internal capability. Every approved area
+of expertise and every governed integration increases what the organisation
+can make available through the same experience. Value grows through reuse,
+not through rebuilding the agent for each platform or use case.
+
+## A proven platform pattern
+
+MOSAIC applies a pattern visible in several industry-leading platforms: create
+an organisational layer above fragmented systems so that people can work in
+terms of outcomes rather than underlying technical complexity.
+
+| Industry platform | The value pattern it demonstrates | The parallel for MOSAIC |
+| --- | --- | --- |
+| [ServiceNow AI Platform](https://www.servicenow.com/products/ai-agents.html) | Unify data, AI, workflows, and security so requests can be coordinated across systems and delivered as outcomes. | Bring operational knowledge and evidence together so users do not have to coordinate every diagnostic step themselves. |
+| [Palantir Ontology and AIP](https://www.palantir.com/platforms/ontology/) | Represent enterprise data, logic, action, and security as a governed context for human and AI decision-making. | Give AI an approved organisational context for how operational questions are understood, evidenced, and governed. |
+| [Backstage](https://backstage.io/docs/overview/technical-overview/) | Place a catalogue and extensible abstraction layer over fragmented developer infrastructure to create one consistent experience. | Place a shared operational layer over specialist procedures and providers while allowing each domain team to retain ownership. |
+| [Microsoft Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/sec-gov-phase2) | Scale agent creation through managed environments, connectors, policy, and lifecycle governance. | Enable more teams to contribute operational intelligence without giving up central control over access and publication. |
+
+MOSAIC is not presented as a replacement for, or equivalent in scope to, these
+established products. The comparison is about the platform strategy: valuable
+enterprise AI emerges when fragmented knowledge and systems become reusable
+through a common, governed operating layer.
+
+## The challenge MOSAIC solves
+
+A general-purpose AI assistant can reason about a problem, but it does not
+inherently know:
 
 - which operational procedure is approved;
 - which systems a particular user or workspace may access;
@@ -29,7 +84,7 @@ does not inherently know:
 - how to distinguish evidence from a plausible-sounding assumption.
 
 MOSAIC introduces governed layers between the language model and operational
-systems. The model works with approved semantic concepts while trusted runtime
+systems. The model reasons in terms of approved outcomes while trusted runtime
 code controls provider selection, arguments, routing, limits, and execution.
 
 ```text
@@ -46,9 +101,24 @@ Bounded read-only MCP request
 Reduced evidence and a qualified response
 ```
 
-This separation is designed to make an investigation reviewable, portable
-between providers, and safer than exposing raw tools or endpoints directly to
+This separation makes investigations repeatable and reviewable, allows a skill
+to survive changes in its underlying provider, and gives the organisation a
+safer route to operational AI than exposing raw tools or endpoints directly to
 the model.
+
+### What makes MOSAIC different
+
+- **Knowledge is a managed product.** Skills are reviewable, versioned assets,
+  not prompt fragments hidden inside application code.
+- **Intent is separated from implementation.** Skills request semantic
+  capabilities; trusted bindings decide which provider and tool can deliver
+  them.
+- **Context is governed.** Sessions discover only authorised skills, goals see
+  only skill-declared capabilities, and target selection never expands access.
+- **Evidence is bounded.** Provider results are constrained and reduced before
+  entering the model context.
+- **The platform is composable.** Procedural skills, operational providers,
+  and output formats can evolve independently around stable contracts.
 
 ## Core concepts
 
@@ -370,9 +440,10 @@ skills:
 - `MOSAIC_SKILLS_MAXIMUM_LOADED_SKILL_COUNT`
 - `MOSAIC_SKILLS_MAXIMUM_LOADED_SKILL_CHARACTERS`
 
-The [skill package format](app/mosaic/SKILL_PACKAGE_FORMAT.md) describes the
-required `SKILL.md` and `mosaic.yaml` files, package hierarchy, validation, and
-progressive-disclosure rules.
+Each skill package contains a required `SKILL.md` instruction document and a
+required `mosaic.yaml` governance document. Packages use the hierarchy
+`skills/<domain>/<function>/<skill-name>`. MOSAIC validates the complete Git
+snapshot before making its skills available for progressive disclosure.
 
 ## The capability runtime snapshot
 
@@ -774,19 +845,6 @@ Longer-term platform work includes:
 - explicit multi-target queries and same-target provider failover; and
 - deterministic workflows and authenticated human approval gates for
   high-risk or mutating operations.
-
-The detailed engineering backlog is maintained in
-[`app/mosaic/MVP_DEVELOPMENT_QUEUE.md`](app/mosaic/MVP_DEVELOPMENT_QUEUE.md) and
-[`app/mosaic/OUTSTANDING_TODOS.md`](app/mosaic/OUTSTANDING_TODOS.md).
-
-## Further documentation
-
-- [Architecture](app/mosaic/ARCHITECTURE.md)
-- [Current implementation status](app/mosaic/CURRENT_IMPLEMENTATION_STATUS.md)
-- [Skill package format](app/mosaic/SKILL_PACKAGE_FORMAT.md)
-- [ADA/ADK integration notes](app/mosaic/ADA_ADK_INTEGRATION_NOTES.md)
-- [MCP integration notes](app/mosaic/MCP_INTEGRATION_NOTES.md)
-- [Development guidelines](app/mosaic/DEVELOPMENT_GUIDELINES.md)
 
 ## Local verification
 
