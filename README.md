@@ -436,17 +436,18 @@ plain-language summary for service owners and executives.
 
 ## Configuration overview
 
-MOSAIC currently uses three main configuration areas:
+MOSAIC currently uses four main configuration areas:
 
 | Area | Current source | Purpose |
 | --- | --- | --- |
-| Model and runtime | Environment variables | Connect ADA to the approved model and apply runtime limits. |
-| Skills | Versioned Git repository | Store reviewable procedures, output guidance, and semantic capability requirements. |
-| Capabilities and providers | Versioned JSON runtime snapshot | Define targets, MCP endpoints, tool allowlists, semantic mappings, routing, and evidence limits. |
+| Model access and runtime controls | Environment variables | Connect ADA to the approved model and apply runtime limits. |
+| Skill catalogue | Versioned Git repository | Publish reviewable **Skills** and their required and optional **Capability requirements**. |
+| Skill profiles | JSON-valued environment variables | Define which **Skills** a **Session** is authorised to discover and use. |
+| Integration manifest | Versioned JSON file | Define **Targets**, **Providers**, **Capabilities**, **Capability bindings**, **Routing**, and **Evidence** limits. |
 
-The capability runtime snapshot is currently a deployment-managed JSON file.
-It is an interim publication format, not the intended long-term authoring and
-governance interface.
+The **Integration manifest** is currently a deployment-managed JSON file. It is
+an interim publication format for the active integration configuration, not
+the intended long-term authoring and governance interface.
 
 ### Required model settings
 
@@ -463,7 +464,7 @@ governance interface.
 | `MOSAIC_SKILLS_REPOSITORY_URL` | URL of the Git skill catalogue. |
 | `MOSAIC_SKILLS_REPOSITORY_REVISION` | Branch, tag, or revision to activate; defaults to `main`. |
 | `MOSAIC_SKILLS_REPOSITORY_CACHE_PATH` | Deployment-local bare Git cache. |
-| `MOSAIC_SKILLS_REPOSITORY_ACCESS_TOKEN` | Repository Bearer token; required and never stored in the catalogue snapshot. |
+| `MOSAIC_SKILLS_REPOSITORY_ACCESS_TOKEN` | Repository Bearer token; required and never stored in the active Skill catalogue or Git cache. |
 | `MOSAIC_SKILLS_SYNCHRONIZATION_TIMEOUT_SECONDS` | Maximum controlled synchronisation time. |
 
 Skill access is configured with JSON-valued environment variables. For
@@ -475,8 +476,9 @@ MOSAIC_SKILLS_DEFAULT_PROFILE_ID=platform-team
 MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS={"example-session":"read-only-summary"}
 ```
 
-Profiles control which skill metadata a session can discover. They are not a
-replacement for authenticated user identity or resource-level authorization.
+**Skill profiles** control which Skill metadata a **Session** can discover.
+They are not a replacement for authenticated user identity or resource-level
+authorisation.
 
 Additional settings bound the number and size of discoverable and loaded
 skills:
@@ -486,10 +488,10 @@ skills:
 - `MOSAIC_SKILLS_MAXIMUM_LOADED_SKILL_COUNT`
 - `MOSAIC_SKILLS_MAXIMUM_LOADED_SKILL_CHARACTERS`
 
-Each skill package contains a required `SKILL.md` instruction document and a
+Each Skill package contains a required `SKILL.md` instruction document and a
 required `mosaic.yaml` governance document. Packages use the hierarchy
 `skills/<domain>/<function>/<skill-name>`. MOSAIC validates the complete Git
-snapshot before making its skills available for progressive disclosure.
+revision before making its Skills available for progressive disclosure.
 
 ## The capability runtime snapshot
 
