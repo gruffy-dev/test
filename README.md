@@ -480,7 +480,7 @@ user-facing concept is the Integration manifest.
 | Environment variable | Purpose |
 | --- | --- |
 | `MOSAIC_CAPABILITY_RUNTIME_SNAPSHOT_PATH` | Absolute path of the active Integration manifest. |
-| `MOSAIC_CAPABILITY_RUNTIME_SNAPSHOT_MAXIMUM_BYTES` | Maximum accepted Integration manifest size in bytes. It defaults to `2000000` bytes and may be set to a positive value up to the hard limit of `10000000` bytes. |
+| `MOSAIC_CAPABILITY_RUNTIME_SNAPSHOT_MAXIMUM_BYTES` | Maximum accepted Integration manifest size in bytes. It defaults to `2000000` bytes and may be set to a positive value up to the current implementation-enforced maximum of `10000000` bytes. |
 | `MOSAIC_CAPABILITY_RESULT_MAXIMUM_RESPONSE_CHARACTERS` | Deployment-wide ceiling for one encoded Provider response. |
 | `MOSAIC_CAPABILITY_RESULT_MAXIMUM_COLLECTION_ITEMS` | Deployment-wide ceiling for one selected Evidence collection. |
 | `MOSAIC_CAPABILITIES_MAXIMUM_CANDIDATE_COUNT` | Maximum number of skill-declared Capabilities exposed for one Goal. |
@@ -589,9 +589,11 @@ missing, malformed, internally inconsistent, or references an unapproved
 provider/tool combination. The file is also rejected when it exceeds
 `MOSAIC_CAPABILITY_RUNTIME_SNAPSHOT_MAXIMUM_BYTES`. This limit defaults to
 `2000000` bytes (2 MB, approximately 1.91 MiB) and may be configured to a
-positive value no greater than the hard limit of `10000000` bytes (10 MB,
-approximately 9.54 MiB). The size check occurs before MOSAIC reads and parses
-the JSON file.
+positive value no greater than the current implementation-enforced maximum of
+`10000000` bytes (10 MB, approximately 9.54 MiB). This upper bound is a MOSAIC
+application guardrail rather than an absolute filesystem or JSON limitation;
+changing it requires a code change. The size check occurs before MOSAIC reads
+and parses the JSON file.
 
 The current document structure is:
 
