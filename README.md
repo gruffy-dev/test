@@ -521,13 +521,31 @@ tenancy, RBAC, and frontend services.
 #### Temporary MVP configuration
 
 Skill profiles and their Session assignments are currently supplied through
-JSON-valued environment variables:
+deployment environment variables:
 
 ```text
 MOSAIC_SKILLS_PROFILES={"platform-team":["inspect-container-platform-workloads","investigate-workload-degradation"],"read-only-summary":["summarize-technical-findings"]}
 MOSAIC_SKILLS_DEFAULT_PROFILE_ID=platform-team
 MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS={"example-session":"read-only-summary"}
 ```
+
+| Environment variable | Temporary MVP purpose |
+| --- | --- |
+| `MOSAIC_SKILLS_PROFILES` | A JSON object that defines the available Skill profiles. Each key is a profile identifier and each value is the list of globally unique Skill names authorised by that profile. Every referenced Skill must exist in the active Skill catalogue. |
+| `MOSAIC_SKILLS_DEFAULT_PROFILE_ID` | The profile assigned to every Session that does not have an explicit entry in `MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS`. Its value must identify a profile declared in `MOSAIC_SKILLS_PROFILES`. |
+| `MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS` | A JSON object that maps exact ADA Session identifiers to profile identifiers declared in `MOSAIC_SKILLS_PROFILES`. It assigns a complete Skill profile to a Session; it does not list Skills directly. |
+
+In the example, the ADA Session named `example-session` receives the
+`read-only-summary` profile and can use only
+`summarize-technical-findings`. Every other Session receives the
+`platform-team` profile through `MOSAIC_SKILLS_DEFAULT_PROFILE_ID`.
+
+MOSAIC resolves this assignment from the current ADA Session identifier and
+places the resulting Skill profile in Session state. The trusted deployment
+configuration is re-evaluated on each agent invocation, so a caller-supplied
+Session-state value cannot grant a different profile or additional Skills.
+Changes to these environment variables take effect when the MOSAIC runtime is
+restarted with the new configuration.
 
 This is a temporary MVP mechanism tightly coupled to runtime deployment. It is
 managed by platform administrators rather than individual users, and it is not
