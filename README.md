@@ -436,20 +436,24 @@ plain-language summary for service owners and executives.
 
 ## Configuration overview
 
-MOSAIC currently uses four main configuration areas:
+MOSAIC configuration is separated by ownership. This distinguishes the
+settings required to operate MOSAIC from the knowledge and integrations
+contributed by domain teams, and from the choices an individual user will
+eventually make.
 
-| Area | Current source | Purpose |
+| Configuration area | Owner | Purpose |
 | --- | --- | --- |
-| Model access and runtime controls | Environment variables | Connect ADA to the approved model and apply runtime limits. |
-| Skill catalogue | Versioned Git repository | Publish reviewable **Skills** and their required and optional **Capability requirements**. |
-| Skill profiles | JSON-valued environment variables | Define which **Skills** a **Session** is authorised to discover and use. |
-| Integration manifest | Versioned JSON file | Define **Targets**, **Providers**, **Capabilities**, **Capability bindings**, **Routing**, and **Evidence** limits. |
+| **MOSAIC platform configuration** | MOSAIC platform administrators | Connect and operate the MOSAIC runtime, select its approved model, locate its governed configuration sources, and enforce deployment-wide limits. |
+| **Operational domain contributions** | Platform and domain teams such as OpenShift, database, observability, and MQ teams | Contribute approved **Skills** and the integration definitions needed to connect their domain knowledge to governed **Capabilities** and **Providers**. |
+| **User and Session configuration** | Users and access administrators | Determine which approved **Skills** are available through a user's **Skill profile**. The current MVP implementation is temporary and platform-managed. |
 
-The **Integration manifest** is currently a deployment-managed JSON file. It is
-an interim publication format for the active integration configuration, not
-the intended long-term authoring and governance interface.
+### MOSAIC platform configuration
 
-### Required model settings
+These settings belong to the MOSAIC deployment and should be managed by MOSAIC
+platform administrators. They are not contribution fields for external domain
+teams and are not user preferences.
+
+#### Approved model access
 
 | Environment variable | Purpose |
 | --- | --- |
@@ -457,7 +461,7 @@ the intended long-term authoring and governance interface.
 | `LLM_MODEL` | Model selected through that access layer. |
 | `AGENT_IDENTIFIER` | Trusted MOSAIC agent identity sent as `x-agent-id`. This is not end-user identity. |
 
-### Skill catalogue settings
+#### Skill catalogue connection
 
 | Environment variable | Purpose |
 | --- | --- |
@@ -467,8 +471,56 @@ the intended long-term authoring and governance interface.
 | `MOSAIC_SKILLS_REPOSITORY_ACCESS_TOKEN` | Repository Bearer token; required and never stored in the active Skill catalogue or Git cache. |
 | `MOSAIC_SKILLS_SYNCHRONIZATION_TIMEOUT_SECONDS` | Maximum controlled synchronisation time. |
 
-Skill access is configured with JSON-valued environment variables. For
-example:
+Platform administrators also configure the active **Integration manifest** and
+deployment-wide safety limits. The existing environment-variable names retain
+`SNAPSHOT` because they are part of the current implementation contract; the
+user-facing concept is the Integration manifest.
+
+| Environment variable | Purpose |
+| --- | --- |
+| `MOSAIC_CAPABILITY_RUNTIME_SNAPSHOT_PATH` | Absolute path of the active Integration manifest. |
+| `MOSAIC_CAPABILITY_RUNTIME_SNAPSHOT_MAXIMUM_BYTES` | Maximum accepted Integration manifest size. |
+| `MOSAIC_CAPABILITY_RESULT_MAXIMUM_RESPONSE_CHARACTERS` | Deployment-wide ceiling for one encoded Provider response. |
+| `MOSAIC_CAPABILITY_RESULT_MAXIMUM_COLLECTION_ITEMS` | Deployment-wide ceiling for one selected Evidence collection. |
+| `MOSAIC_CAPABILITIES_MAXIMUM_CANDIDATE_COUNT` | Maximum number of skill-declared Capabilities exposed for one Goal. |
+| `MOSAIC_CAPABILITIES_MAXIMUM_METADATA_CHARACTERS` | Maximum serialized Capability metadata exposed for one Goal. |
+| `MOSAIC_SKILLS_MAXIMUM_ENABLED_SKILL_COUNT` | Maximum number of Skills authorised by one Skill profile. |
+| `MOSAIC_SKILLS_MAXIMUM_DISCOVERY_METADATA_CHARACTERS` | Maximum Skill metadata exposed during discovery. |
+| `MOSAIC_SKILLS_MAXIMUM_LOADED_SKILL_COUNT` | Maximum Skills loaded for one Goal. |
+| `MOSAIC_SKILLS_MAXIMUM_LOADED_SKILL_CHARACTERS` | Maximum complete Skill content loaded for one Goal. |
+
+### Operational domain contributions
+
+External platform and domain teams contribute two related types of governed
+content:
+
+| Contribution | What it contains | Current MVP publication route |
+| --- | --- | --- |
+| **Skill package** | `SKILL.md` contains the approved instructions. `mosaic.yaml` contains Skill metadata and its required and optional Capability requirements. | Published as a versioned package in the Git Skill catalogue. |
+| **Integration definition** | The team's Targets, Providers, Capabilities, Capability bindings, Routing, and Evidence limits. Credentials and access tokens are never contribution content. | Incorporated into the deployment's versioned JSON Integration manifest and activated by MOSAIC platform administrators. |
+
+Skill packages use the hierarchy
+`skills/<domain>/<function>/<skill-name>`. MOSAIC validates the complete Git
+revision before making its Skills available for progressive disclosure.
+
+The MVP uses one deployment-managed JSON Integration manifest. This is an
+interim publication format, not the intended long-term contribution,
+authoring, review, or governance interface. Future tooling is expected to let
+teams submit and validate independently owned contributions before MOSAIC
+composes and publishes an immutable Integration manifest.
+
+### User and Session configuration
+
+The intended user-facing configuration is the **Skill profile**: the approved
+set of Skills a Session may discover and use. Users do not configure Targets,
+Providers, Capability bindings, or Routing. The intended product experience
+will allow Skill access to be managed through the future identity, tenancy,
+RBAC, and frontend services.
+
+#### Temporary MVP configuration
+
+Skill profiles and their Session assignments are currently supplied through
+JSON-valued environment variables:
 
 ```text
 MOSAIC_SKILLS_PROFILES={"platform-team":["inspect-container-platform-workloads","investigate-workload-degradation"],"read-only-summary":["summarize-technical-findings"]}
@@ -476,22 +528,10 @@ MOSAIC_SKILLS_DEFAULT_PROFILE_ID=platform-team
 MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS={"example-session":"read-only-summary"}
 ```
 
-**Skill profiles** control which Skill metadata a **Session** can discover.
-They are not a replacement for authenticated user identity or resource-level
-authorisation.
-
-Additional settings bound the number and size of discoverable and loaded
-skills:
-
-- `MOSAIC_SKILLS_MAXIMUM_ENABLED_SKILL_COUNT`
-- `MOSAIC_SKILLS_MAXIMUM_DISCOVERY_METADATA_CHARACTERS`
-- `MOSAIC_SKILLS_MAXIMUM_LOADED_SKILL_COUNT`
-- `MOSAIC_SKILLS_MAXIMUM_LOADED_SKILL_CHARACTERS`
-
-Each Skill package contains a required `SKILL.md` instruction document and a
-required `mosaic.yaml` governance document. Packages use the hierarchy
-`skills/<domain>/<function>/<skill-name>`. MOSAIC validates the complete Git
-revision before making its Skills available for progressive disclosure.
+This is a temporary MVP mechanism tightly coupled to runtime deployment. It is
+managed by platform administrators rather than individual users, and it is not
+a replacement for authenticated identity, user or tenant ownership,
+resource-level authorisation, or a durable Skill profile service.
 
 ## The capability runtime snapshot
 
