@@ -524,10 +524,15 @@ Skill profiles and their Session assignments are currently supplied through
 deployment environment variables:
 
 ```text
-MOSAIC_SKILLS_PROFILES={"platform-team":["inspect-container-platform-workloads","investigate-workload-degradation"],"read-only-summary":["summarize-technical-findings"]}
-MOSAIC_SKILLS_DEFAULT_PROFILE_ID=platform-team
-MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS={"example-session":"read-only-summary"}
+MOSAIC_SKILLS_PROFILES={"platform-baseline":["inspect-container-platform-workloads"],"platform-investigation":["inspect-container-platform-workloads","investigate-workload-degradation"]}
+MOSAIC_SKILLS_DEFAULT_PROFILE_ID=platform-baseline
+MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS={"example-session":"platform-investigation"}
 ```
+
+`platform-baseline` and `platform-investigation` are example profile identifiers
+chosen by the MOSAIC administrator. They are not built-in profiles, roles,
+Skills, or permission levels. A Skill profile is simply a named allowlist of
+Skills; administrators may choose different profile identifiers and contents.
 
 | Environment variable | Temporary MVP purpose |
 | --- | --- |
@@ -536,9 +541,10 @@ MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS={"example-session":"read-only-summary"
 | `MOSAIC_SKILLS_SESSION_PROFILE_ASSIGNMENTS` | A JSON object that maps exact ADA Session identifiers to profile identifiers declared in `MOSAIC_SKILLS_PROFILES`. It assigns a complete Skill profile to a Session; it does not list Skills directly. |
 
 In the example, the ADA Session named `example-session` receives the
-`read-only-summary` profile and can use only
-`summarize-technical-findings`. Every other Session receives the
-`platform-team` profile through `MOSAIC_SKILLS_DEFAULT_PROFILE_ID`.
+`platform-investigation` profile. It can use both listed Skills. Every other
+Session receives the `platform-baseline` profile through
+`MOSAIC_SKILLS_DEFAULT_PROFILE_ID` and can use only
+`inspect-container-platform-workloads`.
 
 MOSAIC resolves this assignment from the current ADA Session identifier and
 places the resulting Skill profile in Session state. The trusted deployment
