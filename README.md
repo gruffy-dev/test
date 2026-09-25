@@ -53,24 +53,6 @@ of expertise and every governed integration increases what the organisation
 can make available through the same experience. Value grows through reuse,
 not through rebuilding the agent for each platform or use case.
 
-## A proven platform pattern
-
-MOSAIC applies a pattern visible in several industry-leading platforms: create
-an organisational layer above fragmented systems so that people can work in
-terms of outcomes rather than underlying technical complexity.
-
-| Industry platform | The value pattern it demonstrates | The parallel for MOSAIC |
-| --- | --- | --- |
-| [ServiceNow AI Platform](https://www.servicenow.com/products/ai-agents.html) | Unify data, AI, workflows, and security so requests can be coordinated across systems and delivered as outcomes. | Bring operational knowledge and evidence together so users do not have to coordinate every diagnostic step themselves. |
-| [Palantir Ontology and AIP](https://www.palantir.com/platforms/ontology/) | Represent enterprise data, logic, action, and security as a governed context for human and AI decision-making. | Give AI an approved organisational context for how operational questions are understood, evidenced, and governed. |
-| [Backstage](https://backstage.io/docs/overview/technical-overview/) | Place a catalogue and extensible abstraction layer over fragmented developer infrastructure to create one consistent experience. | Place a shared operational layer over specialist procedures and providers while allowing each domain team to retain ownership. |
-| [Microsoft Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/sec-gov-phase2) | Scale agent creation through managed environments, connectors, policy, and lifecycle governance. | Enable more teams to contribute operational intelligence without giving up central control over access and publication. |
-
-MOSAIC is not presented as a replacement for, or equivalent in scope to, these
-established products. The comparison is about the platform strategy: valuable
-enterprise AI emerges when fragmented knowledge and systems become reusable
-through a common, governed operating layer.
-
 ## The challenge MOSAIC solves
 
 A general-purpose AI assistant can reason about a problem, but it does not
