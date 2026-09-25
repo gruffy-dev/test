@@ -122,8 +122,9 @@ to operational systems.
 
 | Concept | Meaning |
 | --- | --- |
-| **Skill** | Versioned organisational knowledge describing how to approach a task or present its result. A skill declares the semantic capabilities it needs but does not contain provider endpoints or credentials. |
-| **Skill profile** | The set of skills a session is authorised to discover and use. |
+| **Skill** | A versioned package of organisational knowledge. `SKILL.md` contains the approved instructions describing how to approach a task or present its result. `mosaic.yaml` contains the governed metadata, including the skill's required and optional capability requirements. Neither file contains provider endpoints or credentials. |
+| **Skill profile** | The set of skills a session is authorised to discover and use. A profile contains skills, not targets or provider endpoints. |
+| **Capability requirement** | A semantic capability referenced by a skill in `mosaic.yaml`. A required capability must reach a terminal outcome before the goal can complete. An optional capability may be used when it materially helps satisfy the goal. |
 | **Capability** | A provider-neutral outcome MOSAIC can obtain, such as `kubernetes.pods.running.count`. |
 
 ### Integration configuration concepts
@@ -132,26 +133,35 @@ to operational systems.
 | --- | --- |
 | **Target** | The stable, user-meaningful identity of a real operational environment or platform instance, such as `openshift/uk-dev`. A target remains stable even when its provider endpoint changes. |
 | **Provider** | A configured MCP connection, including its concrete endpoint and exact allowlist of callable tools. |
-| **Binding** | The governed mapping between a semantic **capability** and a provider tool, including arguments, target routing, result extraction, and safety limits. |
-| **Integration manifest** | The versioned deployment configuration containing the available targets, providers, capabilities, and bindings. |
+| **Capability binding** | The governed mapping between a semantic **capability** and a provider type and tool, including argument preparation, result extraction, and safety limits. |
+| **Routing** | The governed rule that determines which concrete provider instance can serve a capability for a canonical target. Routing may use a dedicated endpoint for one target or a protected selector on an endpoint shared by several targets. Routing chooses where an already-authorised capability executes; it does not grant additional capabilities. |
+| **Integration manifest** | The versioned deployment configuration containing the available targets, providers, capabilities, capability bindings, and routing rules. |
 
-Skills are the capability-exposure boundary. Selecting a target may choose the
-right provider for a capability, but it must never grant additional
-capabilities that were not declared by the selected skills.
+Users add skills to their profile; they do not add or select targets as profile
+configuration. For each goal, the relevant loaded skills determine which
+capabilities MOSAIC may expose. The capability bindings and provider routing
+then determine the compatible target scope. The user identifies the intended
+environment only through the conversation, either in the original request or
+in response to clarification, and MOSAIC resolves that name to a canonical
+target. An existing session target may be reused when it remains compatible.
 
-A target is not an alias for a provider endpoint. It identifies the real
-environment the user means. Trusted routing may map that target to a dedicated
-endpoint or to a protected selector on an endpoint shared by several targets.
+In short: skills determine what MOSAIC is permitted to investigate. Capability
+bindings determine how the evidence can be obtained. Routing determines which
+provider serves the environment identified in the conversation. Resolving a
+target can never grant capabilities beyond those declared by the loaded,
+authorised skills.
 
 ```mermaid
 flowchart LR
     Caller[Human, application, or AI caller] --> Request
     Request --> Goal
     Session --> Goal
+    Profile[Session skill profile] --> Skills
     Goal --> Skills[Selected skills]
-    Skills --> Capabilities[Semantic capabilities]
+    Skills --> Requirements[Required and optional capability requirements]
+    Requirements --> Capabilities[Semantic capabilities]
     Goal --> Target[Canonical target]
-    Capabilities --> Bindings[Governed bindings]
+    Capabilities --> Bindings[Capability bindings]
     Target --> Routing[Target routing]
     Bindings --> Provider[MCP provider]
     Routing --> Provider
