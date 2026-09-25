@@ -438,14 +438,15 @@ plain-language summary for service owners and executives.
 
 MOSAIC configuration is separated by ownership. This distinguishes the
 settings required to operate MOSAIC from the knowledge and integrations
-contributed by domain teams, and from the choices an individual user will
-eventually make.
+contributed by domain teams, the access boundaries established by workspace
+administrators, and the choices an individual user will eventually make.
 
 | Configuration area | Owner | Purpose |
 | --- | --- | --- |
 | **MOSAIC platform configuration** | MOSAIC platform administrators | Connect and operate the MOSAIC runtime, select its approved model, locate its governed configuration sources, and enforce deployment-wide limits. |
 | **Operational domain contributions** | Platform and domain teams such as OpenShift, database, observability, and MQ teams | Contribute approved **Skills** and the integration definitions needed to connect their domain knowledge to governed **Capabilities** and **Providers**. |
-| **User and Session configuration** | Users and access administrators | Determine which approved **Skills** are available through a user's **Skill profile**. The current MVP implementation is temporary and platform-managed. |
+| **Workspace and access governance** | Tenant, workspace, and access administrators | Determine which approved **Skills** and **Targets** are available to a tenant, workspace, team, or role, and govern Skill profiles, quotas, and access policy. The current MVP implements only a temporary subset of this boundary. |
+| **User and Session configuration** | Users | Select from the **Skills** already authorised for them, manage permitted Session preferences, and identify the intended **Target** through conversation. The self-service experience is future work. |
 
 ### MOSAIC platform configuration
 
@@ -509,13 +510,13 @@ authoring, review, or governance interface. Future tooling is expected to let
 teams submit and validate independently owned contributions before MOSAIC
 composes and publishes an immutable Integration manifest.
 
-### User and Session configuration
+### Workspace and access governance
 
-The intended user-facing configuration is the **Skill profile**: the approved
-set of Skills a Session may discover and use. Users do not configure Targets,
-Providers, Capability bindings, or Routing. The intended product experience
-will allow Skill access to be managed through the future identity, tenancy,
-RBAC, and frontend services.
+This boundary will determine which approved Skills, Targets, and platform
+resources are available within a tenant or workspace and how that access is
+assigned to teams, roles, and users. It is expected to govern Skill profiles,
+Target visibility, quotas, and access policy through the future identity,
+tenancy, RBAC, and frontend services.
 
 #### Temporary MVP configuration
 
@@ -532,6 +533,26 @@ This is a temporary MVP mechanism tightly coupled to runtime deployment. It is
 managed by platform administrators rather than individual users, and it is not
 a replacement for authenticated identity, user or tenant ownership,
 resource-level authorisation, or a durable Skill profile service.
+
+The MVP does not yet provide workspace-scoped Target visibility. Compatible
+Targets are derived from the Capabilities declared by loaded Skills and the
+available Capability bindings and Routing in the Integration manifest.
+
+### User and Session configuration
+
+The intended user-facing configuration is the **Skill profile**: a selection
+of Skills drawn from those already authorised through Workspace and access
+governance. A user may add or remove permitted Skills without configuring the
+underlying integrations.
+
+Users do not configure Providers, Capability bindings, or Routing. They
+identify the intended Target through the conversation, either in the original
+Request or in response to clarification, and MOSAIC may reuse a compatible
+Target within the same Session.
+
+The MVP does not yet provide this self-service experience. Skill profiles and
+Session assignments currently remain platform-managed through the temporary
+environment-variable configuration described above.
 
 ## The capability runtime snapshot
 
