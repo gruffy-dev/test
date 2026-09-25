@@ -372,6 +372,20 @@ completion state is isolated by goal ID. Changing target also requires fresh
 target-bound evidence; MOSAIC never carries a previous target's execution
 outcomes into the new goal.
 
+#### Example: asking about a completed result
+
+Suppose MOSAIC reports that a deployment has unavailable replicas because its
+readiness probe is failing. The user can continue in the same Session and ask:
+
+> What is a readiness probe, and what does that mean for users?
+
+That Request creates a new Goal, but the previous Response remains available as
+conversation context. MOSAIC can explain the unfamiliar term and its likely
+impact without repeating the investigation. If the user instead asks whether
+the probe is still failing now, MOSAIC must use the relevant Skills and
+Capabilities to gather fresh Evidence rather than treating the previous result
+as current.
+
 ## Example use cases
 
 ### Container-platform investigation
