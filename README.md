@@ -132,7 +132,7 @@ to operational systems.
 | --- | --- |
 | **Target** | The stable, user-meaningful identity of a real operational environment or platform instance, such as `openshift/uk-dev`. A target remains stable even when its provider endpoint changes. |
 | **Provider** | A configured MCP connection, including its concrete endpoint and exact allowlist of callable tools. |
-| **Binding** | The governed mapping between a semantic capability and a provider tool, including arguments, target routing, result extraction, and safety limits. |
+| **Binding** | The governed mapping between a semantic **capability** and a provider tool, including arguments, target routing, result extraction, and safety limits. |
 | **Integration manifest** | The versioned deployment configuration containing the available targets, providers, capabilities, and bindings. |
 
 Skills are the capability-exposure boundary. Selecting a target may choose the
