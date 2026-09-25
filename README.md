@@ -104,20 +104,60 @@ the model.
 
 ## Core concepts
 
+The concepts used by MOSAIC fall into three groups: the live interaction,
+governed organisational knowledge, and the configuration that connects MOSAIC
+to operational systems.
+
+### Interaction and runtime concepts
+
 | Concept | Meaning |
 | --- | --- |
-| **Goal** | One complete unit of user work, including its selected skills, target, and capability outcomes. |
-| **Skill** | Versioned guidance describing when and how to perform a procedure or present an answer. |
-| **Capability** | A provider-neutral outcome such as `kubernetes.pods.running.count`. |
-| **Provider** | A configured MCP endpoint with an exact allowlist of callable tools. |
-| **Target** | A stable identity for a deployed environment, such as `openshift/uk-dev`. It is not an endpoint. |
-| **Binding** | Trusted configuration mapping a semantic capability to provider arguments and result handling. |
-| **Runtime snapshot** | One immutable JSON document containing the active targets, providers, capabilities, and bindings. |
-| **Skill profile** | The set of skills authorised for an ADA session. |
+| **Request** | A directive submitted by a human user, client application, or upstream AI agent. |
+| **Goal** | The unit of work MOSAIC creates from a request. It triggers the controlled sequence needed to satisfy the requested outcome: skill discovery, skill selection, capability discovery, target resolution, evidence collection, and response generation. A clarification reply continues the same goal; a later follow-up starts a new one. |
+| **Session** | The continuing interaction context across multiple goals. It retains the authorised skill profile and may retain an active target, but capability outcomes from a completed goal cannot satisfy a later goal. |
+| **Evidence** | Bounded information returned by an approved capability and used to support the response. |
+| **Response** | The result returned for the goal, including relevant conclusions, uncertainty, and material evidence limitations. |
+
+### Governed knowledge concepts
+
+| Concept | Meaning |
+| --- | --- |
+| **Skill** | Versioned organisational knowledge describing how to approach a task or present its result. A skill declares the semantic capabilities it needs but does not contain provider endpoints or credentials. |
+| **Skill profile** | The set of skills a session is authorised to discover and use. |
+| **Capability** | A provider-neutral outcome MOSAIC can obtain, such as `kubernetes.pods.running.count`. |
+
+### Integration configuration concepts
+
+| Concept | Meaning |
+| --- | --- |
+| **Target** | The stable, user-meaningful identity of a real operational environment or platform instance, such as `openshift/uk-dev`. A target remains stable even when its provider endpoint changes. |
+| **Provider** | A configured MCP connection, including its concrete endpoint and exact allowlist of callable tools. |
+| **Binding** | The governed mapping between a semantic capability and a provider tool, including arguments, target routing, result extraction, and safety limits. |
+| **Integration manifest** | The versioned deployment configuration containing the available targets, providers, capabilities, and bindings. |
 
 Skills are the capability-exposure boundary. Selecting a target may choose the
 right provider for a capability, but it must never grant additional
 capabilities that were not declared by the selected skills.
+
+A target is not an alias for a provider endpoint. It identifies the real
+environment the user means. Trusted routing may map that target to a dedicated
+endpoint or to a protected selector on an endpoint shared by several targets.
+
+```mermaid
+flowchart LR
+    Caller[Human, application, or AI caller] --> Request
+    Request --> Goal
+    Session --> Goal
+    Goal --> Skills[Selected skills]
+    Skills --> Capabilities[Semantic capabilities]
+    Goal --> Target[Canonical target]
+    Capabilities --> Bindings[Governed bindings]
+    Target --> Routing[Target routing]
+    Bindings --> Provider[MCP provider]
+    Routing --> Provider
+    Provider --> Evidence
+    Evidence --> Response
+```
 
 ## How MOSAIC works
 
