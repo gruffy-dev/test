@@ -217,160 +217,217 @@ prompt.
 
 ### Interaction workflows
 
-The following diagrams separate the three session interactions that matter to
-users. A **clarification reply** continues the same goal. A **follow-up after a
-completed response** starts a new goal, even though it remains in the same ADA
-session.
+MOSAIC separates the continuing conversation from the individual units of work
+performed within it. A Goal is not a separate process or conversation: it is
+the governed unit of work MOSAIC uses to satisfy one requested outcome.
 
-#### Interaction 1: a new prompt
+| Concept | Meaning |
+| --- | --- |
+| **Session** | The longer-lived ADA conversation. It retains conversation history, the authorised Skill profile and, when one has been established, the active Target. |
+| **Invocation** | One execution of the MOSAIC agent, normally triggered by a user message. |
+| **Goal** | One complete unit of work, from the initial Request until MOSAIC produces a final Response. A Goal may span multiple Invocations when clarification is required. |
+| **Goal state** | The trusted working state MOSAIC retains while completing a Goal, including its phase, selected Skills, declared Capabilities, required outcomes, pinned Target and any clarification question. |
 
-Every new goal receives a new goal ID. MOSAIC binds the session's trusted skill
-profile and forces bounded skill discovery before the model can choose any
-tool. A goal that needs external evidence follows the governed capability path;
-a general-knowledge goal can answer without loading a skill.
+#### How the concepts fit together
 
 ```mermaid
-sequenceDiagram
-    actor User
-    participant ADA as ADA session boundary
-    participant Runtime as MOSAIC runtime
-    participant Catalogue as Validated catalogues
-    participant Model as Approved model
-    participant MCP as MCP provider
+flowchart TB
+    subgraph Session["ADA Session"]
+        direction TB
 
-    User->>ADA: Submit a new prompt
-    ADA->>Runtime: Start invocation
-    Runtime->>Runtime: Create goal and bind session profile
-    Runtime->>Catalogue: Discover authorised skill metadata
-    Catalogue-->>Runtime: Bounded skill summaries
-    Runtime->>Model: Prompt and authorised summaries
+        Context["Session context<br/>Conversation history<br/>Skill profile<br/>Active Target, when known"]
 
-    alt No specialised skill is relevant
-        Model-->>ADA: General-knowledge response
-        ADA-->>User: Final response
-    else One or more skills are relevant
-        Model->>Runtime: Load one complete skill batch
-        Runtime->>Catalogue: Read approved instructions and declarations
-        Catalogue-->>Runtime: Skills and semantic capability names
-
-        alt Loaded skills require capabilities
-            Model->>Runtime: Discover declared capabilities and target
-            alt Target or another essential input needs clarification
-                Runtime-->>Model: Clarification required
-                Model->>Runtime: Record one clarification question
-                Runtime-->>ADA: Pause the goal
-                ADA-->>User: Ask the question
-            else Capability candidates are ready
-                loop Required and useful optional capabilities
-                    Model->>Runtime: Execute semantic capability
-                    Runtime->>MCP: Invoke bound allowlisted tool
-                    MCP-->>Runtime: Provider result
-                    Runtime-->>Model: Bounded reduced evidence
-                end
-                Runtime->>Model: Final request, with output schema if selected
-                Model-->>ADA: Evidence-based response
-                ADA-->>User: Final response
-            end
-        else Skills require no external capability
-            Model-->>ADA: Skill-guided response
-            ADA-->>User: Final response
+        subgraph Goal1["Goal 1 — same Goal ID"]
+            direction LR
+            Invocation1["Invocation 1<br/>Initial Request"]
+            Invocation2["Invocation 2<br/>Clarification reply"]
+            Invocation1 -->|Goal held for clarification| Invocation2
         end
-    end
-```
 
-If the model attempts to finish while a required capability is still pending,
-the runtime replaces that response with an internal continuation call. The
-user sees only the completed response or an explicit clarification question.
-
-#### Interaction 2: replying to a clarification
-
-A clarification reply resumes the existing goal with a new invocation ID. The
-goal ID, loaded skill batch, declared capabilities, and any completed required
-outcomes are retained. Skill discovery and skill loading are not repeated.
-
-```mermaid
-sequenceDiagram
-    actor User
-    participant ADA as ADA session boundary
-    participant Runtime as MOSAIC runtime
-    participant Model as Approved model
-    participant MCP as MCP provider
-
-    User->>ADA: Answer the clarification question
-    ADA->>Runtime: Resume session invocation
-    Runtime->>Runtime: Reopen the same goal
-    Runtime->>Model: Answer plus retained goal context
-
-    alt The missing value was a target
-        Model->>Runtime: Retry capability discovery with target name
-        Runtime->>Runtime: Resolve and pin canonical target
-    else The missing value was a capability input
-        Model->>Runtime: Continue with existing candidates
-    end
-
-    loop Remaining required or useful optional capabilities
-        Model->>Runtime: Execute semantic capability
-        Runtime->>MCP: Invoke bound allowlisted tool
-        MCP-->>Runtime: Provider result
-        Runtime-->>Model: Bounded reduced evidence
-    end
-
-    Runtime->>Model: Final request, with output schema if selected
-    Model-->>ADA: Evidence-based response
-    ADA-->>User: Final response
-    Runtime->>Runtime: Mark goal completed
-```
-
-At present, a new user message received while MOSAIC is awaiting clarification
-is treated as an answer to that clarification. Reliably detecting that the user
-has abandoned the question and started a different goal is planned work.
-
-#### Interaction 3: a follow-up after completion
-
-Once a response has completed, the next user message starts a new goal. MOSAIC
-performs skill discovery again because the follow-up may require a different
-procedure or output. The session's authorised profile and resolved target may
-be reused, but previous capability outcomes cannot satisfy the new goal.
-
-```mermaid
-sequenceDiagram
-    actor User
-    participant ADA as ADA session boundary
-    participant Runtime as MOSAIC runtime
-    participant Target as Session target store
-    participant Catalogue as Validated catalogues
-    participant Model as Approved model
-
-    User->>ADA: Submit a follow-up after completion
-    ADA->>Runtime: Start next invocation
-    Runtime->>Runtime: Create a new goal ID
-    Runtime->>Catalogue: Rediscover authorised skill metadata
-    Catalogue-->>Runtime: Current bounded summaries
-    Runtime->>Model: Follow-up, conversation, and skill summaries
-
-    opt Follow-up needs one or more skills
-        Model->>Runtime: Load the new goal's complete skill batch
-        opt Target-aware capabilities are required
-            Runtime->>Target: Read the active session target
-            alt Existing target is compatible and no change was requested
-                Target-->>Runtime: Reuse canonical target
-            else User explicitly names another configured target
-                Runtime->>Target: Replace active session target
-                Runtime->>Runtime: Pin new target and report the change
-            end
+        subgraph Goal2["Goal 2 — new Goal ID"]
+            Invocation3["Invocation 3<br/>Follow-up Request"]
         end
-    end
 
-    Runtime->>Runtime: Gather fresh goal-scoped evidence
-    Runtime->>Model: Final request
-    Model-->>ADA: Follow-up response
-    ADA-->>User: Final response
+        Context -. available to .-> Invocation1
+        Context -. available to .-> Invocation2
+        Context -. available to .-> Invocation3
+
+        Invocation2 -->|Goal 1 completed<br/>next Request| Invocation3
+    end
 ```
 
-Conversation history can help the model interpret a follow-up, but trusted
-completion state is isolated by goal ID. Changing target also requires fresh
-target-bound evidence; MOSAIC never carries a previous target's execution
-outcomes into the new goal.
+A Session may contain many Goals. Most Goals complete within one Invocation, but
+a Goal can span multiple Invocations when MOSAIC needs additional information
+from the user.
+
+Only the active Goal's orchestration state is retained as working state.
+Completed Requests and Responses remain available through the Session's
+conversation history, but their Capability outcomes cannot satisfy a later
+Goal.
+
+#### Goal lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Planning: New Request<br/>Create Goal ID
+
+    Planning --> Executing: Skills loaded or<br/>Capability work begins
+    Planning --> Awaiting: Clarification required
+    Executing --> Awaiting: Clarification required
+
+    Awaiting --> Planning: User replies<br/>Same Goal ID<br/>New Invocation ID
+
+    Planning --> Completed: Final Response<br/>Completion checks pass
+    Executing --> Completed: Final Response<br/>Completion checks pass
+
+    Completed --> [*]
+```
+
+#### How a Goal starts
+
+A new Goal starts when a Request arrives and the Session has no current Goal,
+or its previous Goal has completed.
+
+MOSAIC then:
+
+1. Creates a new Goal ID and associates the current Invocation with it.
+2. Resolves the Session's trusted Skill profile.
+3. Discovers the authorised Skill metadata available to that profile.
+4. Gives the model the Request, relevant conversation context and bounded Skill
+   summaries.
+5. Allows the model either to answer using general knowledge or to select and
+   load the complete relevant Skill batch.
+6. Exposes only the Capabilities declared by the loaded Skills.
+7. Collects governed Evidence when external information is required.
+8. Produces one final Response for the complete Goal.
+
+Skill discovery occurs for every new Goal, even when the model subsequently
+determines that no specialised Skill is relevant. This applies the same
+governed process consistently without preventing general-knowledge responses.
+
+#### How a Goal is held
+
+A Goal is held when it cannot continue safely without additional information,
+such as a namespace, queue name or Target.
+
+MOSAIC records:
+
+- that the Goal is awaiting clarification;
+- the clarification question;
+- the selected Skills;
+- the declared and discovered Capabilities;
+- any completed required outcomes; and
+- the Goal's pinned Target, if one has been resolved.
+
+The current Invocation then ends and the question is returned to the user.
+There is no agent process left running in the background: the Goal is held as
+trusted state within the ADA Session.
+
+When the user replies, ADA starts a new Invocation. MOSAIC resumes the same
+Goal by:
+
+- retaining the existing Goal ID;
+- assigning the new Invocation ID;
+- retaining the previously loaded Skill batch;
+- retaining the Capability and Target state;
+- retaining any completed required outcomes; and
+- clearing the stored clarification question.
+
+Skill discovery and Skill loading are therefore not repeated for a
+clarification reply.
+
+At present, any new message received while a Goal is awaiting clarification is
+treated as the answer to that clarification. Reliably detecting that the user
+has abandoned the pending Goal and started a different one is planned work.
+
+#### How a Goal ends
+
+The model determines when it has enough information to produce the final
+Response, but MOSAIC decides whether the Goal is structurally allowed to end.
+
+Before accepting the Response, MOSAIC confirms that:
+
+- authorised Skill discovery has completed;
+- the Goal is not awaiting clarification; and
+- every required Capability has reached a terminal outcome.
+
+If the model attempts to respond while a required Capability remains pending,
+MOSAIC continues execution internally. The user does not receive the premature
+Response.
+
+A terminal outcome does not necessarily mean success. A required Capability
+may have:
+
+- succeeded;
+- been unavailable;
+- produced Evidence that exceeded a governed limit;
+- failed;
+- timed out; or
+- been unavailable because a configured safety limit was reached.
+
+These outcomes allow the Goal to end because no required work remains pending,
+but any resulting limitation must be explained in the final Response.
+
+Optional Capabilities may improve the result but do not prevent completion.
+
+For a general-knowledge Goal, Skill discovery still occurs, but no Skill or
+Capability execution may be required. The Goal completes when the model
+produces its final Response.
+
+MOSAIC therefore enforces **structural completion**: the model decides that the
+requested outcome has been addressed, while the runtime ensures that all
+required workflow and Evidence obligations have been resolved.
+
+#### What happens after completion
+
+The completed Goal remains recorded as completed until the next Request
+arrives. It is not continued or reopened by an ordinary follow-up.
+
+The next Request creates a new Goal with:
+
+- a new Goal ID;
+- fresh Skill discovery;
+- a new Skill selection;
+- new Capability candidates; and
+- fresh required-outcome tracking.
+
+Some Session-level context remains available:
+
+- previous conversation and Responses;
+- the Session's authorised Skill profile; and
+- a compatible active Target, when one has already been established.
+
+Previous Capability outcomes cannot satisfy the new Goal. If the follow-up asks
+about the current state of an external system, MOSAIC must gather fresh
+Evidence.
+
+Changing the Target also requires new target-bound Evidence. MOSAIC never
+carries execution outcomes from a previous Target into the new Goal.
+
+#### Why Goal state is isolated
+
+MOSAIC deliberately separates **conversational continuity** from **operational
+trust**.
+
+Conversation history may cross Goal boundaries so that follow-up questions
+remain natural. Trusted operational state—such as selected Skills, Capability
+candidates and completed Capability outcomes—does not cross those boundaries.
+
+| Decision | Rationale |
+| --- | --- |
+| A follow-up after completion receives a new Goal ID. | It establishes a clear boundary between the completed outcome and the new Request. This makes execution, Evidence and limitations attributable to the correct unit of work. |
+| Skills and Capabilities are selected again for each new Goal. | A follow-up may require a different procedure, output format or system access. Reusing the previous selection could expose irrelevant Capabilities or omit newly relevant Skills. |
+| Capability outcomes cannot satisfy a later Goal. | Previous Evidence may be stale, scoped to different inputs or collected for a different question. A successful earlier execution does not prove the current state of an operational system. |
+| A clarification reply retains the same Goal. | The requested outcome has not changed; MOSAIC is only obtaining information needed to complete it. Retaining the Goal avoids repeating completed work. |
+| The Session Target may be reused, but each Goal pins its own Target. | Reuse makes conversation convenient, while Goal-level pinning prevents Evidence from different environments being combined accidentally. |
+| Conversation history remains available. | The model can explain previous findings and understand references such as “that probe” or “the earlier error” without treating the previous investigation as current Evidence. |
+| The Skill profile remains Session-scoped. | The profile represents what the Session is authorised to use, while each Goal independently selects the relevant subset. |
+
+This boundary prevents stale Evidence, Target confusion, unrelated Capability
+state and previous failures from leaking into a new unit of work.
+
+> Conversation context may cross Goal boundaries; authority, execution state
+> and Evidence do not.
 
 #### Example: asking about a completed result
 
@@ -379,12 +436,16 @@ readiness probe is failing. The user can continue in the same Session and ask:
 
 > What is a readiness probe, and what does that mean for users?
 
-That Request creates a new Goal, but the previous Response remains available as
+This creates a new Goal, but the previous Response remains available as
 conversation context. MOSAIC can explain the unfamiliar term and its likely
-impact without repeating the investigation. If the user instead asks whether
-the probe is still failing now, MOSAIC must use the relevant Skills and
-Capabilities to gather fresh Evidence rather than treating the previous result
-as current.
+impact without repeating the investigation.
+
+If the user instead asks:
+
+> Is the readiness probe still failing?
+
+The new Goal must use the relevant Skills and collect fresh Evidence. The
+earlier investigation cannot prove the system's current state.
 
 ## Example use cases
 
