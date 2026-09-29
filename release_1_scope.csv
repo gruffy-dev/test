@@ -1,5 +1,6 @@
 Area,Release 1 approach,Reused foundation,Minimal new development,Explicitly deferred
-Runtime,Use the existing MOSAIC orchestrator and Goal behaviour.,"Current orchestration, routing and provider execution.",Only the Account Skill lookup at a new Goal boundary.,New orchestration behaviours and mid-Goal topic changes.
+Ownership,Developers own non-orchestrator workstreams; the MOSAIC owner retains all orchestrator implementation.,Published ADA and MOSAIC interfaces.,"Explicit contracts, gates and dependency hand-offs between workstreams.","Delegating Goal, planning, routing or orchestration state changes."
+Runtime,Use the existing MOSAIC orchestrator and Goal behaviour.,"Current orchestration, routing and provider execution.","ORCH-1-01 only, implemented exclusively by the MOSAIC owner.",New orchestration behaviours and mid-Goal topic changes.
 ADA,"Use supported REST, SSE and durable Session persistence.",Existing ADA runtime and PostgreSQL Session support.,Confirm interfaces and integrate through the thin access API.,"Direct runner integration, new Session engine and WebSockets."
 Integrations,Use the current reviewed JSON capability snapshot.,Existing snapshot validation and read-only provider bindings.,Pin a shared Git revision for deterministic startup.,Normalized database publications and authoring workflow.
 Skills,Use the current Git-backed Public Skill catalogue.,"Existing Skill packages, hierarchy and review workflow.",Catalogue discovery plus per-Account enabled Skill names.,"Private, restricted and user-authored Skills."
