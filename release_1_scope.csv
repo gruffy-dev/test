@@ -1,0 +1,10 @@
+Area,Release 1 approach,Reused foundation,Minimal new development,Explicitly deferred
+Runtime,Use the existing MOSAIC orchestrator and Goal behaviour.,"Current orchestration, routing and provider execution.",Only the Account Skill lookup at a new Goal boundary.,New orchestration behaviours and mid-Goal topic changes.
+ADA,"Use supported REST, SSE and durable Session persistence.",Existing ADA runtime and PostgreSQL Session support.,Confirm interfaces and integrate through the thin access API.,"Direct runner integration, new Session engine and WebSockets."
+Integrations,Use the current reviewed JSON capability snapshot.,Existing snapshot validation and read-only provider bindings.,Pin a shared Git revision for deterministic startup.,Normalized database publications and authoring workflow.
+Skills,Use the current Git-backed Public Skill catalogue.,"Existing Skill packages, hierarchy and review workflow.",Catalogue discovery plus per-Account enabled Skill names.,"Private, restricted and user-authored Skills."
+Identity,Use revocable development bearer tokens for Human Accounts.,Development environment boundary.,"Token validation, hashing, expiry and revocation.","OIDC, Service identities and automated access."
+Persistence,Use PostgreSQL only for small platform ownership mappings.,ADA persists conversation and runtime Session state.,"Accounts, token metadata, Session ownership and enabled Skills.","Integration documents, Skill content and usage ledger."
+Web application,"Provide chat, Sessions and Public Skill selection only.",ADA and MOSAIC runtime APIs.,A thin independent web application.,"Administration, publication, workbench and chargeback UI."
+Provider security,Use development data and explicitly read-only MCP servers.,Current shared provider access.,Verify read-only configuration and document the limitation.,"Delegated identity, MCP shim and platform-specific RBAC."
+Operations,"Support a controlled, invite-only development pilot.","Existing GCP, ADA and Terraform deployment workflow.","Health, correlation, failure tests and a pilot runbook.","Production HA, autoscaling proof, distributed rate limits and chargeback."

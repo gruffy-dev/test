@@ -1,0 +1,14 @@
+Area,Release 1 decision,Rationale,Replacement or follow-on
+Release shape,"Release 1 is a controlled, invite-only development pilot.",It demonstrates the complete user value path without claiming production readiness.,Production controls follow after real usage.
+Delivery,"Reuse the existing orchestrator, Git catalogue and JSON snapshot.",Replacing working mechanisms would add schedule risk without improving the pilot outcome.,Each temporary mechanism has a named follow-on epic.
+Identity,Use Human Accounts with revocable development bearer tokens.,This establishes trusted Account ownership with much less work than OIDC.,OIDC and independent Service identities are F1.
+Multi-Account design,Every Session and enabled-Skill set belongs to one Account.,The pilot proves isolation with two Accounts while retaining the intended multi-user boundary.,No shared workspace or team entity is introduced.
+Sessions,ADA persists conversation and runtime Session state; the access API persists ownership mappings.,MOSAIC does not duplicate ADA Session storage.,Retention and administration follow observed usage.
+Concurrency,Allow one active request per Session and concurrent work across different Sessions.,This avoids queueing and conflicting state mutations.,Production limits are added later with exact 429 behaviour.
+Goals,Use the current Goal and clarification behaviour in Release 1.,New cancellation and topic-switching semantics would expand core orchestrator work.,Explicit cancellation and new-topic controls are F6.
+Skills,All Public Skills are visible; Accounts enable individual Skills or an explicit current group.,Users need discovery and personal selection to experience the product value.,"Private, restricted and marketplace authoring are F4."
+Integration configuration,Load the current validated JSON from a pinned reviewed Git revision.,This gives every stateless replica the same startup configuration with minimal change.,Normalized PostgreSQL Integration publication is F3.
+Provider access,Use development data and read-only MCP servers with shared provider access.,This is acceptable only for the development pilot and avoids premature shim work.,Delegated provider identity and RBAC are F2.
+Transport,Use REST commands and SSE streaming.,These match the current interaction and avoid unnecessary realtime infrastructure.,WebSockets are considered only if later features require them.
+Administration,Provision Accounts and tokens through controlled CLI or SQL tooling.,An administration UI is not necessary for a small invited pilot.,Operational UI follows demonstrated need.
+Audit and cost,Rely on ADA/GCP logging and telemetry for the pilot.,Duplicating telemetry before confirming gaps creates avoidable work.,Usage attribution and chargeback are F7.

@@ -1,0 +1,13 @@
+Order,Release,Increment,Epic ID,Epic,Objective,Dependencies,Owner boundary,Stories,Status
+0,Release 1,0. Prove the current path,R1-E0,Current runtime proof,"Confirm and demonstrate the existing ADA, MOSAIC, Git catalogue and JSON snapshot path before adding platform features.",None,Platform / ADA / MOSAIC,5,Proposed
+1,Release 1,1. Controlled access,R1-E1,Controlled access API,"Add the smallest trusted boundary needed for Human Account authentication, Session ownership and ADA request forwarding.",R1-E0,Backend / Security / ADA,8,Proposed
+2,Release 1,1. Controlled access,R1-E2,Minimal web experience,"Provide only the web experience required to authenticate, manage Sessions and converse with MOSAIC.",R1-E0; R1-E1 API contract,Frontend,6,Proposed
+3,Release 1,2. Personal Sessions and Skills,R1-E3,Account-owned Sessions and Skills,Persist the minimum Account mappings required for isolation and personal Public Skill enablement while Git remains the catalogue source.,R1-E1; PostgreSQL,Backend / Frontend / Database / MOSAIC dependency,9,Proposed
+4,Release 1,3. Development pilot,R1-E4,Development pilot readiness,"Verify the narrow release is read-only, isolated, observable and repeatable in development.",R1-E0 through R1-E3,Platform / QA / Security,7,Proposed
+5,Post-Release 1,Future,F1,Production identity and automation,Replace development tokens with production Human Account identity and independent Service identities.,Release 1 learning,Identity / Backend,3,Deferred
+6,Post-Release 1,Future,F2,MCP security shim and delegated RBAC,Propagate trusted identity to vendor MCP servers and enforce platform-specific access at each provider call.,F1,Security / Platform integration,3,Deferred
+7,Post-Release 1,Future,F3,Integration registry and publication,"Move Integration configuration from reviewed JSON to normalized, immutable PostgreSQL publications.",Release 1 usage,Backend / Database,3,Deferred
+8,Post-Release 1,Future,F4,Skill authoring and marketplace,"Support Private, Public and restricted Skill lifecycles with governed validation and publication.",Release 1 catalogue learning,Marketplace / Backend / Frontend,4,Deferred
+9,Post-Release 1,Future,F5,Integration authoring workbench,"Provide a separate application for visualising, validating and publishing Integration definitions.",F3,Workbench team,3,Deferred
+10,Post-Release 1,Future,F6,Advanced interaction and lifecycle controls,"Add richer cancellation, topic changes, retention, administration and production request controls.",Release 1 usage,Frontend / Backend / MOSAIC owner,4,Deferred
+11,Day 2/3,Future,F7,Usage attribution and chargeback,Assess ADA and GCP telemetry before adding any MOSAIC-specific usage ledger.,Production identity and telemetry,Platform / FinOps,2,Deferred
