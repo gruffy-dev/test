@@ -515,6 +515,29 @@ These settings belong to the MOSAIC deployment and should be managed by MOSAIC
 platform administrators. They are not contribution fields for external domain
 teams and are not user preferences.
 
+#### Required MCP transport setting
+
+> **Required for the current deployment:** set
+> `GOOGLE_API_USE_CLIENT_CERTIFICATE=false` before starting MOSAIC.
+
+| Environment variable | Required value | Purpose |
+| --- | --- | --- |
+| `GOOGLE_API_USE_CLIENT_CERTIFICATE` | `false` | Disables Google ADK's automatic client-certificate mTLS probe for the current MCP endpoints, which do not use client-certificate authentication. |
+
+Google ADK 2.5.0 attempts to configure an mTLS channel whenever it creates an
+HTTP MCP session, including for a plain `http://` endpoint. ADA's
+`MCPHeaderProvider` also generates a new `x-uuid` for each header-provider
+call. Because ADK includes the complete header set in its session identity,
+tool discovery and execution may create separate sessions and repeat the mTLS
+probe. On slower hosts this added latency can exceed MOSAIC's 30-second MCP
+timeout before the actual tool call completes.
+
+The current MCP providers do not require client certificates, so explicitly
+disabling this probe is the correct deployment configuration and avoids the
+unnecessary delay. This setting is process-wide. If a future deployment needs
+client-certificate mTLS for any MCP provider, do not disable it globally;
+introduce a provider-scoped transport configuration instead.
+
 #### Approved model access
 
 | Environment variable | Purpose |
